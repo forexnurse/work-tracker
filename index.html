@@ -1,1 +1,25 @@
 
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"/><title>Test</title></head>
+<body>
+<h1 id="status">Testing connection...</h1>
+<pre id="output"></pre>
+<script>
+const URL = 'https://nrbysupzownhfwoxifm.supabase.co';
+const KEY = 'sb_publishable_8aeE3dteRb5iyXVpAqO7YQ_xDP1sLY7';
+fetch(URL+'/rest/v1/entries?select=*', {
+  headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}
+})
+.then(r => r.text())
+.then(t => {
+  document.getElementById('status').textContent = 'Response received:';
+  document.getElementById('output').textContent = t;
+})
+.catch(e => {
+  document.getElementById('status').textContent = 'Error:';
+  document.getElementById('output').textContent = e.toString();
+});
+</script>
+</body>
+</html>
