@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +35,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .last-saved{font-size:11px;color:var(--subtle);background:var(--card);border:1px solid var(--border);border-radius:99px;padding:4px 12px;display:flex;align-items:center;gap:5px;white-space:nowrap;}
 .last-saved i{color:var(--green-m);}
-.icon-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--r);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:16px;transition:all .15s;}
+.icon-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--r);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;transition:all .15s;font-family:"tabler-icons",sans-serif;}
 .icon-btn:hover{background:var(--blue-l);color:var(--blue-m);border-color:var(--blue-m);}
 .add-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;border-radius:var(--r);background:linear-gradient(135deg,var(--blue-m),var(--green-m));border:none;color:#fff;font-family:inherit;box-shadow:0 2px 8px rgba(37,99,235,.3);}
 .add-btn:hover{opacity:.9;}
@@ -170,7 +169,9 @@ td{padding:10px 10px;border-bottom:1px solid #F0EDE8;color:var(--text);vertical-
 body.dark td{border-bottom-color:#1E293B;}
 tr:last-child td{border-bottom:none;}
 tr.selected td{background:#EFF6FF!important;}
-body.dark tr.selected td{background:#1E3A5F!important;}
+body.dark tr.selected td{background:#2563EB!important;color:#fff!important;}
+body.dark tr.selected td .amount{color:#fff!important;}
+body.dark tr.selected td .badge{opacity:.9;}
 tr:hover td{background:#FAFAF8;}
 body.dark tr:hover td{background:#1E293B;}
 tr.banked-row td{border-left:3px solid var(--bank);}
@@ -233,6 +234,22 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
 
 @media print{.modal-actions,.header,.controls,.filters,.metrics,.section-head,.bulk-bar,.bulk-edit-panel,.form-card,.table-wrap,.toast,.modal-close,.bank-panel,button{display:none!important;}.modal-overlay{position:static;background:none;padding:0;}.modal{box-shadow:none;max-height:none;padding:0;}.invoice-box{border:none;}}
 @media(max-width:640px){.app{padding:1rem .75rem 3rem;}.metrics{grid-template-columns:repeat(2,1fr);}.mv{font-size:18px;}.header{flex-direction:column;}}
+
+/* Pay period widget */
+.paycheck-widget{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem 1.5rem;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.paycheck-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.paycheck-header h3{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.paycheck-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1rem;}
+.pc-card{background:var(--bg);border-radius:var(--r);padding:.75rem 1rem;border:1px solid var(--border);}
+.pc-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-bottom:4px;}
+.pc-value{font-size:18px;font-weight:600;color:var(--text);}
+.pc-sub{font-size:11px;color:var(--subtle);margin-top:2px;}
+.pc-period{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.pc-period-btn{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;}
+.pc-period-btn.active{background:var(--blue-m);color:#fff;border-color:var(--blue-m);}
+.pc-progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:8px;}
+.pc-progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-m),var(--green-m));transition:width .5s;}
+.pc-days{font-size:11px;color:var(--subtle);margin-top:4px;display:flex;justify-content:space-between;}
 </style>
 </head>
 <body>
@@ -246,9 +263,9 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
     <div class="header-right">
       <div class="last-saved" id="last-saved"><i class="ti ti-clock"></i> Not saved yet</div>
       <div class="header-actions">
-        <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Dark mode"><i class="ti ti-moon"></i></button>
+        <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Dark mode">🌙</button>
         <div class="export-wrap">
-          <button class="icon-btn" onclick="toggleExportMenu()" title="Export &amp; Reports"><i class="ti ti-download"></i></button>
+          <button class="icon-btn" onclick="toggleExportMenu()" title="Export &amp; Reports">⬇️</button>
           <div class="export-menu" id="export-menu">
             <p class="em-label">Export</p>
             <div class="em-item" onclick="exportCSV()"><i class="ti ti-file-spreadsheet" style="color:var(--green-m);"></i> Download CSV</div>
@@ -260,7 +277,7 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
             <div class="em-item" onclick="showInvoice()"><i class="ti ti-receipt" style="color:var(--teal);"></i> Generate invoice</div>
           </div>
         </div>
-        <button class="icon-btn" onclick="toggleBankPanel()" title="Hour bank"><i class="ti ti-piggy-bank" style="color:var(--bank);"></i></button>
+        <button class="icon-btn" onclick="toggleBankPanel()" title="Hour bank" style="font-size:20px;">🏦</button>
         <button class="add-btn" onclick="openForm()"><i class="ti ti-plus"></i> Add entry</button>
       </div>
     </div>
@@ -290,17 +307,17 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       <div class="period-dropdown-wrap">
         <button class="period-dropdown-btn" onclick="togglePeriodMenu()">
-          <span id="period-dropdown-label"><i class="ti ti-calendar-week"></i> Week</span>
-          <i class="ti ti-chevron-down" style="font-size:12px;color:var(--subtle);"></i>
+          <span id="period-dropdown-label">📅 Week</span>
+          <span style="font-size:11px;color:var(--subtle);">▼</span>
         </button>
         <div class="period-dropdown-menu" id="period-menu">
-          <div class="pdm-item" onclick="setPeriod('day',event)"><i class="ti ti-calendar-event"></i> Day</div>
-          <div class="pdm-item active" onclick="setPeriod('week',event)"><i class="ti ti-calendar-week"></i> Week</div>
-          <div class="pdm-item" onclick="setPeriod('month',event)"><i class="ti ti-calendar-month"></i> Month</div>
-          <div class="pdm-item" onclick="setPeriod('quarter',event)"><i class="ti ti-calendar-stats"></i> Quarter</div>
-          <div class="pdm-item" onclick="setPeriod('year',event)"><i class="ti ti-calendar"></i> Year</div>
+          <div class="pdm-item" onclick="setPeriod('day',event)">📅 Day</div>
+          <div class="pdm-item active" onclick="setPeriod('week',event)">📅 Week</div>
+          <div class="pdm-item" onclick="setPeriod('month',event)">📅 Month</div>
+          <div class="pdm-item" onclick="setPeriod('quarter',event)">📅 Quarter</div>
+          <div class="pdm-item" onclick="setPeriod('year',event)">📅 Year</div>
           <hr class="pdm-divider"/>
-          <div class="pdm-item" onclick="setPeriod('custom',event)"><i class="ti ti-calendar-search"></i> Custom range</div>
+          <div class="pdm-item" onclick="setPeriod('custom',event)">🗓️ Custom range</div>
         </div>
       </div>
       <div id="custom-range">
@@ -309,9 +326,9 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
         <input type="date" id="custom-end" onchange="render()"/>
       </div>
       <div class="nav-row" id="nav-arrows">
-        <button class="ab" onclick="shiftPeriod(-1)"><i class="ti ti-chevron-left"></i></button>
+        <button class="ab" onclick="shiftPeriod(-1)" title="Previous period" style="font-size:18px;font-weight:700;">‹</button>
         <span id="period-label">—</span>
-        <button class="ab" onclick="shiftPeriod(1)"><i class="ti ti-chevron-right"></i></button>
+        <button class="ab" onclick="shiftPeriod(1)" title="Next period" style="font-size:18px;font-weight:700;">›</button>
       </div>
     </div>
   </div>
@@ -349,6 +366,30 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
       <p class="mv" id="m-bank" style="color:var(--bank);">0h</p>
       <p class="ms" id="m-bank-sub">Click to withdraw</p>
     </div>
+  </div>
+
+
+  <!-- Pay period widget -->
+  <div class="paycheck-widget" id="paycheck-widget">
+    <div class="paycheck-header">
+      <h3>💰 Next paycheque estimate</h3>
+      <div class="pc-period">
+        <span style="font-size:12px;color:var(--subtle);">Pay period:</span>
+        <button class="pc-period-btn active" id="pp-current-btn" onclick="setPayView('current')">Current</button>
+        <button class="pc-period-btn" id="pp-next-btn" onclick="setPayView('next')">Next</button>
+        <button class="pc-period-btn" id="pp-last-btn" onclick="setPayView('last')">Last paid</button>
+      </div>
+    </div>
+    <div class="paycheck-grid">
+      <div class="pc-card"><p class="pc-label">Period</p><p class="pc-value" id="pp-dates" style="font-size:13px;font-weight:500;">—</p><p class="pc-sub" id="pp-payday"></p></div>
+      <div class="pc-card"><p class="pc-label">Hours worked</p><p class="pc-value" id="pp-hours">0h</p><p class="pc-sub" id="pp-banked-sub"></p></div>
+      <div class="pc-card"><p class="pc-label">Hourly pay</p><p class="pc-value" id="pp-hrly">$0.00</p></div>
+      <div class="pc-card"><p class="pc-label">KM reimb.</p><p class="pc-value" id="pp-km">$0.00</p></div>
+      <div class="pc-card"><p class="pc-label">Expenses</p><p class="pc-value" id="pp-exp">$0.00</p></div>
+      <div class="pc-card" style="border-color:var(--green-m);"><p class="pc-label" style="color:var(--green-m);">Est. paycheque</p><p class="pc-value" id="pp-total" style="color:var(--green-m);">$0.00</p><p class="pc-sub" id="pp-outstanding"></p></div>
+    </div>
+    <div class="pc-progress"><div class="pc-progress-bar" id="pp-progress" style="width:0%"></div></div>
+    <div class="pc-days"><span id="pp-days-elapsed"></span><span id="pp-days-left"></span></div>
   </div>
 
   <div class="section-head">
@@ -419,7 +460,7 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
     <hr class="divider"/>
     <label class="travel-toggle"><input type="checkbox" id="f-travel-chk" onchange="toggleTravel(this.checked)"><i class="ti ti-car"></i> Displacement from home base</label>
     <div class="travel-fields" id="travel-fields">
-      <div class="fg"><label>Travel time (hours)</label><input type="number" id="f-tmin" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-tmin"></span></div>
+      <div class="fg"><label>Travel time (minutes)</label><input type="number" id="f-tmin" placeholder="0" min="0" step="1" oninput="updateFormCalc()"/><span class="field-hint" id="hint-tmin"></span></div>
       <div class="fg"><label>Distance (km)</label><input type="number" id="f-km" placeholder="0" min="0" step="0.1" oninput="updateFormCalc()"/><span class="field-hint" id="hint-km"></span></div>
       <div class="fg"><label>Travel rate ($/km)</label><input type="number" id="f-krate" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-krate"></span></div>
       <div class="fg"><label>Destination</label><input type="text" id="f-dest" placeholder="Client site, city…"/><span class="field-hint" id="hint-dest"></span></div>
@@ -492,7 +533,7 @@ async function apiFetch(path,opts={}){
 async function loadEntries(){
   try{const d=await apiFetch('entries?select=*&order=date.desc');entries=d||[];}
   catch(e){showToast('Error loading data');entries=[];}
-  updateTagFilter();selectedIds.clear();updateBulkBar();render();
+  updateTagFilter();selectedIds.clear();updateBulkBar();render();renderPayWidget();
 }
 
 // ── Calculation engine ────────────────────────────────────
@@ -509,7 +550,7 @@ function calcEntry(hours, ot, rate, otm, exp, km, tmin_h, krate, banking, hasTra
   const om      = parseFloat(otm)||1;
   const expense = parseFloat(exp)||0;
   const km_val  = parseFloat(km)||0;
-  const trav_h  = hasTrav?(parseFloat(tmin_h)||0):0;
+  const trav_h  = hasTrav?((parseFloat(tmin_h)||0)/60):0;  // tmin_h is in minutes, convert to hours
   const kr      = parseFloat(krate)||0;
 
   const km_reimb  = km_val * kr;
@@ -552,11 +593,11 @@ function updateFormCalc(){
   let html='<strong>Calculation preview</strong><br>';
   if(banking){
     html+=`<span style="color:var(--bank);">🏦 Banking ${fmt_h(c.reg_h+c.ot_h)} — these hours go into your bank</span><br>`;
-    html+=`Travel time: ${fmt_h(c.trav_h)} × ${fmt(c.r)}/h = <strong>${fmt(c.trav_h*c.r)}</strong><br>`;
+    html+=`Travel time: ${fmtMin(c.trav_h*60)} × ${fmt(c.r)}/h = <strong>${fmt(c.trav_h*c.r)}</strong><br>`;
   } else {
     html+=`Work hours: ${fmt_h(c.reg_h)} × ${fmt(c.r)}/h = ${fmt(c.reg_h*c.r)}<br>`;
     if(c.ot_h>0) html+=`Overtime: ${fmt_h(c.ot_h)} × ${fmt(c.r)} × ${c.om} = ${fmt(c.ot_h*c.r*c.om)}<br>`;
-    if(c.trav_h>0) html+=`Travel time: ${fmt_h(c.trav_h)} × ${fmt(c.r)}/h = ${fmt(c.trav_h*c.r)}<br>`;
+    if(c.trav_h>0) html+=`Travel time: ${fmtMin(c.trav_h*60)} × ${fmt(c.r)}/h = ${fmt(c.trav_h*c.r)}<br>`;
   }
   if(c.km_val>0) html+=`KM reimb: ${c.km_val.toFixed(1)} km × ${fmt(c.kr)}/km = <strong>${fmt(c.km_reimb)}</strong><br>`;
   if(c.expense>0) html+=`Expenses: ${fmt(c.expense)}<br>`;
@@ -570,15 +611,15 @@ function toggleDark(){
   document.body.classList.toggle('dark');
   const on=document.body.classList.contains('dark');
   localStorage.setItem('wt_dark',on?'1':'');
-  document.getElementById('dark-btn').innerHTML=on?'<i class="ti ti-sun"></i>':'<i class="ti ti-moon"></i>';
+  document.getElementById('dark-btn').innerHTML=on?'☀️':'🌙';
 }
-if(localStorage.getItem('wt_dark')){document.body.classList.add('dark');document.getElementById('dark-btn').innerHTML='<i class="ti ti-sun"></i>';}
+if(localStorage.getItem('wt_dark')){document.body.classList.add('dark');document.getElementById('dark-btn').innerHTML='☀️';}
 
 // ── Last used ─────────────────────────────────────────────
 function saveLast(k,v){if(v!==''&&v!=null)localStorage.setItem(LK[k],String(v));}
 function getLast(k){return localStorage.getItem(LK[k])||'';}
 function fillHints(){
-  const fmtMap={rate:v=>'$'+parseFloat(v).toFixed(2)+'/h',otm:v=>v+'×',exp:v=>'$'+parseFloat(v).toFixed(2),km:v=>v+' km',tmin:v=>v+' h',krate:v=>'$'+parseFloat(v).toFixed(2)+'/km',hours:v=>v+'h',ot:v=>v+'h',loc:v=>v,dest:v=>v,inv:v=>v,tag:v=>v};
+  const fmtMap={rate:v=>'$'+parseFloat(v).toFixed(2)+'/h',otm:v=>v+'×',exp:v=>'$'+parseFloat(v).toFixed(2),km:v=>v+' km',tmin:v=>v+' min',krate:v=>'$'+parseFloat(v).toFixed(2)+'/km',hours:v=>v+'h',ot:v=>v+'h',loc:v=>v,dest:v=>v,inv:v=>v,tag:v=>v};
   Object.keys(LK).forEach(k=>{
     const v=getLast(k);const el=document.getElementById('hint-'+k);
     if(el)el.innerHTML=v&&fmtMap[k]?`<i class="ti ti-history" style="font-size:10px;"></i> Last: ${fmtMap[k](v)}`:'';
@@ -896,7 +937,7 @@ function showMileageReport(){
     <p style="font-size:12px;color:var(--subtle);margin-bottom:12px;">All displacement entries — use for tax deduction purposes.</p>
     <table class="report-table">
       <thead><tr><th>Date</th><th>Destination</th><th>KM</th><th>Travel time</th><th>Rate</th><th>KM Reimb.</th></tr></thead>
-      <tbody>${te.map(e=>`<tr><td>${e.date}</td><td>${e.dest||'—'}</td><td>${parseFloat(e.km).toFixed(1)} km</td><td>${fmt_h(e.tmin||0)}</td><td>${e.krate?fmt(e.krate)+'/km':'—'}</td><td>${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td></tr>`).join('')}</tbody>
+      <tbody>${te.map(e=>`<tr><td>${e.date}</td><td>${e.dest||'—'}</td><td>${parseFloat(e.km).toFixed(1)} km</td><td>${fmtMin(e.tmin||0)}</td><td>${e.krate?fmt(e.krate)+'/km':'—'}</td><td>${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td></tr>`).join('')}</tbody>
     </table>
     <div class="report-total"><span>Total: ${totKm.toFixed(1)} km &nbsp;·&nbsp; ${fmt_h(totH)}</span><span>${totEarn>0?fmt(totEarn)+' reimbursable':''}</span></div>`;
   document.getElementById('modal-overlay').classList.add('open');
@@ -915,7 +956,7 @@ function showPayPeriodReport(){
     const key=pSun.toISOString().split('T')[0];
     if(!groups[key])groups[key]={start:pSun.toISOString().split('T')[0],end:pSat.toISOString().split('T')[0],entries:[],hours:0,ot:0,earned:0,banked:0};
     groups[key].entries.push(e);
-    groups[key].hours+=(e.hours||0)+(e.tmin||0);
+    groups[key].hours+=(e.hours||0)+((e.tmin||0)/60);
     groups[key].ot+=(e.ot||0);
     groups[key].earned+=(e.earned||0);
     groups[key].banked+=(e.banked_hours||0);
@@ -1011,7 +1052,7 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.export-wrap'))document.getElementById('export-menu').classList.remove('open');
   if(!e.target.closest('.period-dropdown-wrap'))document.getElementById('period-menu').classList.remove('open');
 });
-const PL={day:'<i class="ti ti-calendar-event"></i> Day',week:'<i class="ti ti-calendar-week"></i> Week',month:'<i class="ti ti-calendar-month"></i> Month',quarter:'<i class="ti ti-calendar-stats"></i> Quarter',year:'<i class="ti ti-calendar"></i> Year',custom:'<i class="ti ti-calendar-search"></i> Custom'};
+const PL={day:'📅 Day',week:'📅 Week',month:'📅 Month',quarter:'📅 Quarter',year:'📅 Year',custom:'📅 Custom'};
 function setPeriod(p,ev){
   currentPeriod=p;periodOffset=0;
   document.getElementById('period-dropdown-label').innerHTML=PL[p];
@@ -1056,7 +1097,7 @@ function getPeriodRange(period,offset){
 // ── Formatting ────────────────────────────────────────────
 function fmt(n){return'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 function fmt_h(n){n=parseFloat(n)||0;return n===0?'0h':(n%1===0?n+'h':n.toFixed(2)+'h');}
-function fmtMin(n){if(!n||n===0)return'—';if(n<1)return Math.round(n*60)+'min';const h=Math.floor(n),m=Math.round((n-h)*60);return h+'h'+(m>0?' '+m+'min':'');}
+function fmtMin(n){if(!n||n===0)return'—';if(n<60)return Math.round(n)+'min';const h=Math.floor(n/60),m=Math.round(n%60);return h+'h'+(m>0?' '+m+'min':'');}
 function updateLastSaved(){const now=new Date();document.getElementById('last-saved').innerHTML=`<i class="ti ti-circle-check"></i> Saved ${now.toLocaleDateString('en-CA',{month:'short',day:'numeric'})} at ${now.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}`;}
 
 // ── Render ────────────────────────────────────────────────
@@ -1066,7 +1107,7 @@ function render(){
   const f=getFiltered();
 
   // Metrics
-  const totH=f.reduce((s,e)=>s+(e.hours||0)+(e.tmin||0),0);
+  const totH=f.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
   const totOT=f.reduce((s,e)=>s+(e.ot||0),0);
   const totHrly=f.reduce((s,e)=>s+(e.hrly_pay||0),0);
   const totKmEarn=f.reduce((s,e)=>s+(e.trav_earn||0),0);
@@ -1145,6 +1186,89 @@ function render(){
       </div></td>
     </tr>`;
   }).join('');
+}
+
+
+// ── Pay period engine ─────────────────────────────────────
+// Pay periods: bi-weekly starting April 13, 2026 (job start)
+// Last pay: May 16. Next pay: May 30.
+const PAY_START = new Date('2026-04-13T00:00:00');
+let payView = 'current';
+
+function getPayPeriod(offset){
+  // Each period is 14 days from PAY_START
+  const today = new Date();
+  const msPerPeriod = 14 * 86400000;
+  const elapsed = today - PAY_START;
+  const currentPeriodNum = Math.floor(elapsed / msPerPeriod);
+  const targetNum = currentPeriodNum + offset;
+  const pStart = new Date(PAY_START.getTime() + targetNum * msPerPeriod);
+  const pEnd = new Date(pStart.getTime() + msPerPeriod - 86400000);
+  const payDay = new Date(pEnd.getTime() + 86400000); // paid day after period ends
+  return { start: pStart, end: pEnd, payDay, num: targetNum };
+}
+
+function toDateStr(d){
+  return d.toISOString().split('T')[0];
+}
+
+function setPayView(v){
+  payView = v;
+  document.getElementById('pp-current-btn').classList.toggle('active', v==='current');
+  document.getElementById('pp-next-btn').classList.toggle('active', v==='next');
+  document.getElementById('pp-last-btn').classList.toggle('active', v==='last');
+  renderPayWidget();
+}
+
+function renderPayWidget(){
+  const offset = payView==='current' ? 0 : payView==='next' ? 1 : -1;
+  const pp = getPayPeriod(offset);
+  const start = toDateStr(pp.start);
+  const end = toDateStr(pp.end);
+
+  // Filter entries in this period
+  const periodEntries = entries.filter(e => e.date >= start && e.date <= end && !e.banked);
+  const totH = periodEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
+  const totOT = periodEntries.reduce((s,e)=>s+(e.ot||0),0);
+  const totHrly = periodEntries.reduce((s,e)=>s+(e.hrly_pay||0),0);
+  const totKm = periodEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const totExp = periodEntries.reduce((s,e)=>s+(e.exp||0),0);
+  const totBanked = periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const total = periodEntries.reduce((s,e)=>s+(e.earned||0),0);
+  const outstanding = periodEntries.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+
+  // Progress through period
+  const today = new Date();
+  const msPerPeriod = 14 * 86400000;
+  const elapsed = Math.max(0, today - pp.start);
+  const progress = Math.min(100, (elapsed / msPerPeriod) * 100);
+  const daysElapsed = Math.min(14, Math.floor(elapsed / 86400000));
+  const daysLeft = Math.max(0, 14 - daysElapsed);
+
+  // Payday info
+  const payDayStr = pp.payDay.toLocaleDateString('en-CA', {month:'short', day:'numeric', year:'numeric'});
+  const daysUntilPay = Math.ceil((pp.payDay - today) / 86400000);
+  let payDayMsg = '';
+  if(payView==='last') payDayMsg = 'Paid ' + payDayStr;
+  else if(daysUntilPay <= 0) payDayMsg = '🎉 Payday is today!';
+  else if(daysUntilPay === 1) payDayMsg = '🎉 Payday tomorrow!';
+  else payDayMsg = `Payday in ${daysUntilPay} days (${payDayStr})`;
+
+  // Update DOM
+  document.getElementById('pp-dates').textContent =
+    pp.start.toLocaleDateString('en-CA',{month:'short',day:'numeric'}) + ' – ' +
+    pp.end.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+  document.getElementById('pp-payday').textContent = payDayMsg;
+  document.getElementById('pp-hours').textContent = fmt_h(totH + totOT);
+  document.getElementById('pp-banked-sub').textContent = totBanked > 0 ? fmt_h(totBanked) + ' banked' : '';
+  document.getElementById('pp-hrly').textContent = fmt(totHrly);
+  document.getElementById('pp-km').textContent = fmt(totKm);
+  document.getElementById('pp-exp').textContent = fmt(totExp);
+  document.getElementById('pp-total').textContent = fmt(total);
+  document.getElementById('pp-outstanding').textContent = outstanding > 0 ? fmt(outstanding) + ' unpaid' : '✓ All paid';
+  document.getElementById('pp-progress').style.width = progress.toFixed(1) + '%';
+  document.getElementById('pp-days-elapsed').textContent = payView==='current' ? daysElapsed + ' days in' : '';
+  document.getElementById('pp-days-left').textContent = payView==='current' ? daysLeft + ' days left' : '';
 }
 
 function filterByTag(tag){document.getElementById('filter-tag').value=tag;render();}
