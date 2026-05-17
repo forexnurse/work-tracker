@@ -163,13 +163,14 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
 .b-travel{background:var(--purple-l);color:var(--purple);}
 .b-tag{background:var(--teal-l);color:var(--teal);cursor:pointer;}
 .inv-sel{font-size:11px;background:transparent;border:1px solid var(--border);border-radius:99px;padding:2px 8px;color:var(--text);cursor:pointer;font-family:inherit;}
-.act-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:5px 6px;border-radius:6px;line-height:1;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;}
-.act-btn.edit{color:var(--blue-m);}
-.act-btn.edit:hover{background:var(--blue-l);}
-.act-btn.dup{color:var(--green-m);}
-.act-btn.dup:hover{background:var(--green-l);}
-.act-btn.del{color:var(--red);}
-.act-btn.del:hover{background:var(--red-l);}
+.act-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;font-size:16px;transition:all .15s;font-weight:600;}
+.act-btn.edit{background:var(--blue-l);color:var(--blue-m);border:1px solid var(--blue-m);}
+.act-btn.edit:hover{background:var(--blue-m);color:#fff;}
+.act-btn.dup{background:var(--green-l);color:var(--green-m);border:1px solid var(--green-m);}
+.act-btn.dup:hover{background:var(--green-m);color:#fff;}
+.act-btn.del{background:var(--red-l);color:var(--red);border:1px solid var(--red);}
+.act-btn.del:hover{background:var(--red);color:#fff;}
+.actions-cell{display:flex;gap:5px;align-items:center;}
 .actions-cell{display:flex;gap:3px;align-items:center;}
 .empty{text-align:center;color:var(--subtle);font-size:13px;padding:3rem 0;}
 .note-cell{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;}
@@ -387,7 +388,7 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
         <th style="width:104px;">Travel</th>
         <th style="width:80px;">Invoice</th>
         <th>Notes</th>
-        <th style="width:90px;min-width:90px;">Actions</th>
+        <th style="width:100px;min-width:100px;">Actions</th>
       </tr></thead>
       <tbody id="log-body"></tbody>
     </table>
@@ -485,34 +486,50 @@ function openForm(){
 }
 
 function editEntry(id){
-  closeBulkEdit();
-  document.getElementById('entry-form').classList.remove('open');
+  // Stop row-click from firing
+  if(window.event)window.event.stopPropagation();
+  // Hide and reset the form completely first
+  const form = document.getElementById('entry-form');
+  form.classList.remove('open');
+  form.style.display = 'none';
+  editId = null;
   clearForm();
-  const e=entries.find(x=>x.id===id);if(!e)return;
-  editId=id;
-  document.getElementById('form-title').innerHTML='<i class="ti ti-pencil"></i> Editing — '+e.date;
-  document.getElementById('btn-save').innerHTML='<i class="ti ti-check"></i> Update entry';
-  document.getElementById('f-date').value=e.date||'';
-  document.getElementById('f-hours').value=e.hours!=null?e.hours:'';
-  document.getElementById('f-ot').value=e.ot!=null?e.ot:'';
-  document.getElementById('f-rate').value=e.rate!=null?e.rate:'';
-  document.getElementById('f-otm').value=e.otm?String(e.otm):'1.5';
-  document.getElementById('f-exp').value=e.exp!=null?e.exp:'';
-  document.getElementById('f-loc').value=e.loc||'';
-  document.getElementById('f-inv').value=e.inv||'unpaid';
-  document.getElementById('f-note').value=e.note||'';
-  document.getElementById('f-tag').value=e.tag||'';
-  const hasTrav=(parseFloat(e.km)||0)>0;
-  document.getElementById('f-travel-chk').checked=hasTrav;
+  // Find the entry
+  const e = entries.find(x => x.id === id);
+  if(!e){ showToast('Entry not found'); return; }
+  editId = id;
+  // Update form heading
+  document.getElementById('form-title').innerHTML = '<i class="ti ti-pencil"></i>&nbsp;Editing — ' + e.date;
+  document.getElementById('btn-save').innerHTML = '<i class="ti ti-check"></i>&nbsp;Update entry';
+  // Fill every field
+  document.getElementById('f-date').value  = e.date  || '';
+  document.getElementById('f-hours').value = e.hours != null ? e.hours : '';
+  document.getElementById('f-ot').value    = e.ot    != null ? e.ot    : '';
+  document.getElementById('f-rate').value  = e.rate  != null ? e.rate  : '';
+  document.getElementById('f-otm').value   = e.otm   ? String(e.otm)   : '1.5';
+  document.getElementById('f-exp').value   = e.exp   != null ? e.exp   : '';
+  document.getElementById('f-loc').value   = e.loc   || '';
+  document.getElementById('f-inv').value   = e.inv   || 'unpaid';
+  document.getElementById('f-note').value  = e.note  || '';
+  document.getElementById('f-tag').value   = e.tag   || '';
+  // Travel section
+  const hasTrav = (parseFloat(e.km) || 0) > 0;
+  document.getElementById('f-travel-chk').checked = hasTrav;
   toggleTravel(hasTrav);
-  if(hasTrav){document.getElementById('f-km').value=e.km||'';document.getElementById('f-tmin').value=e.tmin||'';document.getElementById('f-dest').value=e.dest||'';document.getElementById('f-krate').value=e.krate||'';}
-  requestAnimationFrame(()=>{
-    document.getElementById('entry-form').classList.add('open');
-    document.getElementById('entry-form').scrollIntoView({behavior:'smooth',block:'start'});
-  });
+  if(hasTrav){
+    document.getElementById('f-km').value    = e.km    || '';
+    document.getElementById('f-tmin').value  = e.tmin  || '';
+    document.getElementById('f-dest').value  = e.dest  || '';
+    document.getElementById('f-krate').value = e.krate || '';
+  }
+  // Show the form
+  form.style.display = 'block';
+  form.classList.add('open');
+  // Scroll to form
+  setTimeout(function(){ form.scrollIntoView({behavior:'smooth', block:'start'}); }, 50);
 }
 
-function closeForm(){document.getElementById('entry-form').classList.remove('open');clearForm();editId=null;}
+function closeForm(){const f=document.getElementById('entry-form');f.classList.remove('open');f.style.display='';clearForm();editId=null;}
 function clearForm(){
   ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-inv').value='unpaid';document.getElementById('f-otm').value='1.5';
@@ -861,9 +878,15 @@ function render(){
       </select></td>
       <td><span class="note-cell" title="${(e.note||'').replace(/"/g,'&quot;')}">${e.note||'—'}</span></td>
       <td onclick="event.stopPropagation()"><div class="actions-cell">
-        <button class="act-btn edit" onclick="editEntry(${e.id})" title="Edit"><i class="ti ti-pencil"></i></button>
-        <button class="act-btn dup" onclick="duplicateEntry(${e.id})" title="Duplicate to today"><i class="ti ti-copy"></i></button>
-        <button class="act-btn del" onclick="deleteEntry(${e.id})" title="Delete"><i class="ti ti-trash"></i></button>
+        <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit this entry">
+          <i class="ti ti-pencil"></i>
+        </button>
+        <button class="act-btn dup" onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">
+          <i class="ti ti-copy"></i>
+        </button>
+        <button class="act-btn del" onclick="event.stopPropagation();deleteEntry(${e.id});" title="Delete this entry">
+          <i class="ti ti-trash"></i>
+        </button>
       </div></td>
     </tr>`;
   }).join('');
