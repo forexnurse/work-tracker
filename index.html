@@ -253,6 +253,39 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
 .pc-progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:8px;}
 .pc-progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue-m),var(--green-m));transition:width .5s;}
 .pc-days{font-size:11px;color:var(--subtle);margin-top:4px;display:flex;justify-content:space-between;}
+
+/* Multi-tag input */
+.tag-input-wrap{border:1px solid var(--border);border-radius:8px;background:#FAFAF8;padding:4px 8px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;min-height:38px;cursor:text;transition:border-color .15s,box-shadow .15s;}
+body.dark .tag-input-wrap{background:#0F172A;}
+.tag-input-wrap:focus-within{border-color:var(--blue-m);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.tag-pill{display:inline-flex;align-items:center;gap:4px;background:var(--teal-l);color:var(--teal);font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+body.dark .tag-pill{background:#042F2E;color:#2DD4BF;}
+.tag-pill-x{background:none;border:none;cursor:pointer;color:var(--teal);font-size:13px;padding:0;line-height:1;margin-left:2px;}
+.tag-pill-x:hover{color:var(--red);}
+.tag-text-input{border:none;outline:none;background:transparent;font-size:13px;color:var(--text);font-family:inherit;min-width:100px;flex:1;padding:2px 4px;}
+.tag-autocomplete{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;min-width:180px;max-height:200px;overflow-y:auto;display:none;}
+.tag-autocomplete.open{display:block;}
+.tag-ac-item{padding:8px 14px;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px;}
+.tag-ac-item:hover,.tag-ac-item.highlighted{background:var(--blue-l);color:var(--blue);}
+.tag-ac-item .ac-count{font-size:11px;color:var(--subtle);margin-left:auto;}
+.tag-wrap-outer{position:relative;}
+
+/* Multi-tag filter */
+.tag-filter-wrap{position:relative;}
+.tag-filter-btn{display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-family:inherit;cursor:pointer;min-width:140px;justify-content:space-between;}
+.tag-filter-btn.active{border-color:var(--teal);background:var(--teal-l);color:var(--teal);}
+.tag-filter-dropdown{position:absolute;top:calc(100%+4px);left:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:200;min-width:200px;max-height:280px;overflow-y:auto;display:none;padding:6px 0;}
+.tag-filter-dropdown.open{display:block;}
+.tag-filter-search{padding:6px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--card);}
+.tag-filter-search input{width:100%;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:inherit;outline:none;}
+.tag-filter-item{padding:7px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text);}
+.tag-filter-item:hover{background:var(--bg);}
+.tag-filter-item input[type=checkbox]{accent-color:var(--teal);cursor:pointer;}
+.tag-filter-clear{padding:7px 14px;font-size:12px;color:var(--subtle);cursor:pointer;border-top:1px solid var(--border);text-align:center;}
+.tag-filter-clear:hover{background:var(--bg);color:var(--text);}
+.active-tag-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.filter-pill{display:inline-flex;align-items:center;gap:4px;background:var(--teal-l);color:var(--teal);font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;}
+.filter-pill-x{background:none;border:none;cursor:pointer;color:var(--teal);font-size:12px;padding:0;}
 </style>
 </head>
 <body>
@@ -337,7 +370,18 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
   </div>
 
   <div class="filters">
-    <select class="filter-select" id="filter-tag" onchange="render()"><option value="">All projects/tags</option></select>
+    <div class="tag-filter-wrap">
+      <button class="tag-filter-btn" id="tag-filter-btn" onclick="toggleTagFilterDropdown()">
+        <span id="tag-filter-label">All tags</span>
+        <span style="font-size:11px;">▼</span>
+      </button>
+      <div class="tag-filter-dropdown" id="tag-filter-dropdown">
+        <div class="tag-filter-search"><input type="text" id="tag-filter-search" placeholder="Search tags…" oninput="renderTagFilterList()"/></div>
+        <div id="tag-filter-list"></div>
+        <div class="tag-filter-clear" onclick="clearTagFilter()">Clear all</div>
+      </div>
+    </div>
+    <div class="active-tag-pills" id="active-tag-pills"></div>
     <select class="filter-select" id="filter-inv" onchange="render()">
       <option value="">All invoices</option>
       <option value="unpaid">Unpaid</option>
@@ -455,7 +499,19 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
       <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-exp"></span></div>
       <div class="fg"><label>Location</label><input type="text" id="f-loc" placeholder="Office, remote…"/><span class="field-hint" id="hint-loc"></span></div>
       <div class="fg"><label>Invoice status</label><select id="f-inv"><option value="unpaid">Unpaid</option><option value="sent">Invoice sent</option><option value="paid">Paid</option></select><span class="field-hint" id="hint-inv"></span></div>
-      <div class="fg"><label>Project / Tag</label><input type="text" id="f-tag" placeholder="e.g. Client A"/><span class="field-hint" id="hint-tag"></span></div>
+      <div class="fg" style="position:relative;">
+        <label>Projects / Tags</label>
+        <div class="tag-wrap-outer">
+          <div class="tag-input-wrap" id="tag-input-wrap" onclick="document.getElementById('tag-text').focus()">
+            <div id="tag-pills"></div>
+            <input type="text" id="tag-text" class="tag-text-input" placeholder="Type to add tags…" autocomplete="off"
+              oninput="onTagInput()" onkeydown="onTagKeydown(event)" onfocus="showTagAC()" onblur="setTimeout(hideTagAC,150)"/>
+          </div>
+          <div class="tag-autocomplete" id="tag-autocomplete"></div>
+        </div>
+        <span class="field-hint" id="hint-tag"></span>
+        <input type="hidden" id="f-tag"/>
+      </div>
     </div>
     <div class="fg" style="margin-bottom:12px;"><label>Notes</label><textarea id="f-note" placeholder="Task, project, description…"></textarea></div>
 
@@ -652,7 +708,7 @@ function openForm(){
   closeBulkEdit();
   const form=document.getElementById('entry-form');
   form.style.display='none';form.classList.remove('open');
-  editId=null;clearForm();
+  editId=null;formTags=[];clearForm();
   document.getElementById('form-title').innerHTML='<i class="ti ti-plus" style="color:var(--blue-m);"></i> New entry';
   document.getElementById('btn-save').innerHTML='<i class="ti ti-device-floppy"></i> Save entry';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
@@ -682,7 +738,7 @@ function editEntry(id){
   document.getElementById('f-loc').value=e.loc||'';
   document.getElementById('f-inv').value=e.inv||'unpaid';
   document.getElementById('f-note').value=e.note||'';
-  document.getElementById('f-tag').value=e.tag||'';
+  setFormTags(e.tag||'');
   document.getElementById('f-bank').checked=e.banked||false;
   const hasTrav=(parseFloat(e.km)||0)>0||(parseFloat(e.tmin)||0)>0;
   document.getElementById('f-travel-chk').checked=hasTrav;
@@ -704,6 +760,7 @@ function closeForm(){
   clearForm();editId=null;
 }
 function clearForm(){
+  formTags=[];renderFormTags();
   ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-inv').value='unpaid';
   document.getElementById('f-otm').value='1';
@@ -729,7 +786,7 @@ async function saveEntry(){
   const loc=document.getElementById('f-loc').value.trim();
   const inv=document.getElementById('f-inv').value;
   const note=document.getElementById('f-note').value.trim();
-  const tag=document.getElementById('f-tag').value.trim();
+  const tag=getFormTagString();
   const banking=document.getElementById('f-bank').checked;
   const hasTrav=document.getElementById('f-travel-chk').checked;
   const km=hasTrav?(parseFloat(document.getElementById('f-km').value)||0):0;
@@ -892,12 +949,16 @@ function renderBankPanel(){
 // ── Bulk ──────────────────────────────────────────────────
 function getFiltered(){
   const{start,end}=getPeriodRange(currentPeriod,periodOffset);
-  const tagF=document.getElementById('filter-tag').value;
   const invF=document.getElementById('filter-inv').value;
   const bankF=document.getElementById('filter-bank').value;
   return entries.filter(e=>{
     if(e.date<start||e.date>end)return false;
-    if(tagF&&(e.tag||'')!==tagF)return false;
+    // Multi-tag filter: entry must have ALL selected tags (OR logic: ANY selected tag)
+    if(selectedTags.size>0){
+      const entryTags=(e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
+      const hasAny=[...selectedTags].some(t=>entryTags.includes(t));
+      if(!hasAny)return false;
+    }
     if(invF&&e.inv!==invF)return false;
     if(bankF==='banked'&&!e.banked)return false;
     if(bankF==='paid'&&e.banked)return false;
@@ -1205,7 +1266,8 @@ function render(){
     const travelCell=(e.km||0)>0||((e.tmin||0)>0)?
       `<span class="badge b-travel">${(e.km||0)>0?parseFloat(e.km).toFixed(1)+'km':''}</span>${(e.tmin||0)>0?'<br><span class="travel-cell">'+fmtMin(e.tmin)+(e.dest?' · '+e.dest:'')+'</span>':''}`
       :'<span style="color:#ccc;">—</span>';
-    const tagCell=e.tag?`<span class="badge b-tag" onclick="filterByTag('${e.tag}')" style="cursor:pointer;">${e.tag}</span>`:'<span style="color:#ccc;">—</span>';
+    const entryTags=(e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const tagCell=entryTags.length?entryTags.map(t=>`<span class="badge b-tag" onclick="filterByTag('${t}')" style="cursor:pointer;margin-right:2px;">${t}</span>`).join(''):'<span style="color:#ccc;">—</span>';
     const breakdown=e.banked?`<div class="breakdown">🏦 ${fmt_h(e.banked_hours||0)} banked</div>`:(e.tmin>0?`<div class="breakdown">incl. ${fmtMin(e.tmin)} travel</div>`:'');
     return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" ${sel?'checked':''} onchange="toggleRowCb(${e.id},this.checked)"/></td>
@@ -1348,7 +1410,166 @@ function renderPayWidget(){
   document.getElementById('pp-days-left').textContent = isCurrent ? daysLeft+' days left' : '';
 }
 
-function filterByTag(tag){document.getElementById('filter-tag').value=tag;render();}
+
+// ── Multi-tag system ──────────────────────────────────────
+let formTags = [];        // tags currently in the form
+let selectedTags = new Set(); // tags selected in filter
+let acHighlight = -1;
+
+function getAllTags(){
+  // Collect all unique tags from all entries (tags stored as comma-separated)
+  const tagSet = {};
+  entries.forEach(e => {
+    const tags = (e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
+    tags.forEach(t => { tagSet[t] = (tagSet[t]||0)+1; });
+  });
+  return tagSet; // {tagName: count}
+}
+
+function getTagSuggestions(query){
+  const all = getAllTags();
+  const q = query.toLowerCase();
+  return Object.entries(all)
+    .filter(([t]) => !formTags.includes(t) && (!q || t.toLowerCase().includes(q)))
+    .sort((a,b) => b[1]-a[1]); // sort by frequency
+}
+
+function renderFormTags(){
+  const pills = document.getElementById('tag-pills');
+  if(!pills) return;
+  pills.innerHTML = formTags.map((t,i) => `
+    <span class="tag-pill">${t}<button class="tag-pill-x" onclick="removeFormTag(${i})" tabindex="-1">×</button></span>
+  `).join('');
+  // Update hidden input
+  const hidden = document.getElementById('f-tag');
+  if(hidden) hidden.value = formTags.join(',');
+}
+
+function removeFormTag(idx){
+  formTags.splice(idx,1);
+  renderFormTags();
+}
+
+function addFormTag(tag){
+  tag = tag.trim();
+  if(!tag || formTags.includes(tag)) return;
+  formTags.push(tag);
+  renderFormTags();
+  const inp = document.getElementById('tag-text');
+  if(inp){ inp.value=''; }
+  hideTagAC();
+}
+
+function onTagInput(){
+  acHighlight = -1;
+  showTagAC();
+}
+
+function onTagKeydown(e){
+  const inp = document.getElementById('tag-text');
+  const ac = document.getElementById('tag-autocomplete');
+  const items = ac.querySelectorAll('.tag-ac-item');
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    if(acHighlight>=0 && items[acHighlight]){
+      addFormTag(items[acHighlight].dataset.tag);
+    } else if(inp.value.trim()){
+      addFormTag(inp.value);
+    }
+  } else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    acHighlight = Math.min(acHighlight+1, items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    acHighlight = Math.max(acHighlight-1, -1);
+    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
+  } else if(e.key==='Backspace' && !inp.value && formTags.length){
+    formTags.pop(); renderFormTags();
+  }
+}
+
+function showTagAC(){
+  const inp = document.getElementById('tag-text');
+  const ac = document.getElementById('tag-autocomplete');
+  if(!inp||!ac) return;
+  const suggestions = getTagSuggestions(inp.value);
+  if(!suggestions.length){ ac.classList.remove('open'); return; }
+  ac.innerHTML = suggestions.map(([t,c])=>
+    `<div class="tag-ac-item" data-tag="${t}" onmousedown="addFormTag('${t}')">
+      <span>🏷️</span><span>${t}</span><span class="ac-count">${c}×</span>
+    </div>`
+  ).join('');
+  ac.classList.add('open');
+}
+
+function hideTagAC(){
+  const ac = document.getElementById('tag-autocomplete');
+  if(ac) ac.classList.remove('open');
+}
+
+function setFormTags(tagStr){
+  formTags = (tagStr||'').split(',').map(t=>t.trim()).filter(Boolean);
+  renderFormTags();
+}
+
+function getFormTagString(){
+  return formTags.join(',');
+}
+
+// ── Tag filter ────────────────────────────────────────────
+function toggleTagFilterDropdown(){
+  const dd = document.getElementById('tag-filter-dropdown');
+  const isOpen = dd.classList.toggle('open');
+  if(isOpen){ renderTagFilterList(); setTimeout(()=>document.getElementById('tag-filter-search').focus(),50); }
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.tag-filter-wrap')) document.getElementById('tag-filter-dropdown').classList.remove('open');
+});
+
+function renderTagFilterList(){
+  const query = (document.getElementById('tag-filter-search').value||'').toLowerCase();
+  const all = getAllTags();
+  const filtered = Object.entries(all).filter(([t])=>!query||t.toLowerCase().includes(query)).sort((a,b)=>b[1]-a[1]);
+  const list = document.getElementById('tag-filter-list');
+  if(!filtered.length){ list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--subtle);">No tags found</div>'; return; }
+  list.innerHTML = filtered.map(([t,c])=>`
+    <div class="tag-filter-item">
+      <input type="checkbox" ${selectedTags.has(t)?'checked':''} onchange="toggleTagFilter('${t}',this.checked)"/>
+      <span>${t}</span>
+      <span class="ac-count" style="margin-left:auto;font-size:11px;color:var(--subtle);">${c} entr${c===1?'y':'ies'}</span>
+    </div>`).join('');
+}
+
+function toggleTagFilter(tag, checked){
+  if(checked) selectedTags.add(tag);
+  else selectedTags.delete(tag);
+  updateTagFilterUI();
+  render();
+}
+
+function clearTagFilter(){
+  selectedTags.clear();
+  updateTagFilterUI();
+  document.getElementById('tag-filter-dropdown').classList.remove('open');
+  render();
+}
+
+function updateTagFilterUI(){
+  const btn = document.getElementById('tag-filter-btn');
+  const label = document.getElementById('tag-filter-label');
+  const pillsEl = document.getElementById('active-tag-pills');
+  const n = selectedTags.size;
+  btn.classList.toggle('active', n>0);
+  label.textContent = n===0 ? 'All tags' : n+' tag'+(n===1?'':'s')+' selected';
+  pillsEl.innerHTML = [...selectedTags].map(t=>
+    `<span class="filter-pill">🏷️ ${t}<button class="filter-pill-x" onclick="toggleTagFilter('${t}',false);renderTagFilterList()">×</button></span>`
+  ).join('');
+}
+
+function updateTagFilter(){ renderTagFilterList(); }
+
+function filterByTag(tag){ selectedTags.clear(); selectedTags.add(tag); updateTagFilterUI(); render(); }
 function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
 // ── Startup: ensure new DB columns ────────────────────────
