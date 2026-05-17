@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,21 +11,22 @@
   --bg:#F0EDE8;--card:#FFF;--border:#E2DDD8;--text:#1C1917;--muted:#78716C;--subtle:#A8A29E;
   --green:#065F46;--green-l:#D1FAE5;--green-m:#059669;
   --blue:#1E3A8A;--blue-l:#DBEAFE;--blue-m:#2563EB;
-  --amber:#92400E;--amber-l:#FEF3C7;
+  --amber:#92400E;--amber-l:#FEF3C7;--amber-m:#D97706;
   --rose:#9D174D;--rose-l:#FCE7F3;
   --purple:#4C1D95;--purple-l:#EDE9FE;
   --teal:#0F766E;--teal-l:#CCFBF1;
   --red:#DC2626;--red-l:#FEE2E2;
   --orange:#C2410C;--orange-l:#FFEDD5;
+  --bank:#7C3AED;--bank-l:#EDE9FE;
   --r:10px;--r2:14px;
 }
 body.dark{
   --bg:#0F172A;--card:#1E293B;--border:#334155;--text:#F1F5F9;--muted:#94A3B8;--subtle:#64748B;
-  --green-l:#064E3B;--blue-l:#1E3A5F;--amber-l:#451A03;--rose-l:#4C0519;--purple-l:#2E1065;--teal-l:#042F2E;--red-l:#450A0A;--orange-l:#431407;
+  --green-l:#064E3B;--blue-l:#1E3A5F;--amber-l:#451A03;--rose-l:#4C0519;--purple-l:#2E1065;--teal-l:#042F2E;--red-l:#450A0A;--orange-l:#431407;--bank-l:#2E1065;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
-.app{max-width:1020px;margin:0 auto;padding:1.5rem 1rem 4rem;}
+.app{max-width:1040px;margin:0 auto;padding:1.5rem 1rem 4rem;}
 
 /* Header */
 .header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;}
@@ -36,27 +38,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .last-saved i{color:var(--green-m);}
 .icon-btn{background:var(--card);border:1px solid var(--border);border-radius:var(--r);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:16px;transition:all .15s;}
 .icon-btn:hover{background:var(--blue-l);color:var(--blue-m);border-color:var(--blue-m);}
-.icon-btn.active{background:var(--text);color:var(--card);}
 .add-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding:9px 20px;cursor:pointer;border-radius:var(--r);background:linear-gradient(135deg,var(--blue-m),var(--green-m));border:none;color:#fff;font-family:inherit;box-shadow:0 2px 8px rgba(37,99,235,.3);}
 .add-btn:hover{opacity:.9;}
 
 /* Export dropdown */
 .export-wrap{position:relative;}
-.export-menu{position:absolute;top:calc(100%+4px);right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:200;min-width:200px;display:none;overflow:hidden;}
+.export-menu{position:absolute;top:calc(100%+4px);right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:200;min-width:210px;display:none;overflow:hidden;}
 .export-menu.open{display:block;}
 .em-item{padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text);}
 .em-item:hover{background:var(--bg);}
 .em-divider{border:none;border-top:1px solid var(--border);margin:4px 0;}
 .em-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);padding:8px 14px 4px;}
 
-/* OT alert banner */
-.ot-alert{display:none;align-items:center;gap:10px;background:#FEF3C7;border:1px solid #F59E0B;border-radius:var(--r);padding:10px 16px;margin-bottom:1rem;font-size:13px;color:#92400E;}
-body.dark .ot-alert{background:#451A03;border-color:#B45309;color:#FDE68A;}
-.ot-alert.show{display:flex;}
-.ot-alert i{font-size:18px;color:#D97706;}
+/* OT / Bank alerts */
+.alert-bar{display:none;align-items:center;gap:10px;border-radius:var(--r);padding:10px 16px;margin-bottom:.75rem;font-size:13px;}
+.alert-bar.show{display:flex;}
+.alert-bar i{font-size:18px;}
+.alert-ot{background:#FEF3C7;border:1px solid #F59E0B;color:#92400E;}
+.alert-bank{background:var(--bank-l);border:1px solid var(--bank);color:var(--bank);}
+body.dark .alert-ot{background:#451A03;border-color:#B45309;color:#FDE68A;}
+body.dark .alert-bank{background:#1E1035;color:#C4B5FD;}
 
 /* Controls */
-.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
+.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:10px;}
 .period-dropdown-wrap{position:relative;}
 .period-dropdown-btn{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;padding:7px 14px;border-radius:var(--r);border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-family:inherit;min-width:130px;justify-content:space-between;}
 .period-dropdown-menu{position:absolute;top:calc(100%+4px);left:0;background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:100;min-width:160px;display:none;overflow:hidden;}
@@ -72,25 +76,33 @@ body.dark .ot-alert{background:#451A03;border-color:#B45309;color:#FDE68A;}
 #custom-range{display:none;align-items:center;gap:6px;}
 #custom-range input[type=date]{font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-family:inherit;}
 
-/* Filters row */
+/* Filters */
 .filters{display:flex;align-items:center;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
 .filter-select{font-size:12px;padding:5px 10px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-family:inherit;cursor:pointer;}
-.filter-select.active{border-color:var(--blue-m);background:var(--blue-l);color:var(--blue);}
 .ot-threshold-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
 .ot-threshold-wrap input{width:52px;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:var(--card);color:var(--text);font-family:inherit;}
 
 /* Metrics */
-.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem;}
-.metric{background:var(--card);border-radius:var(--r2);padding:1rem 1.1rem;border:1px solid var(--border);position:relative;overflow:hidden;}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1rem;}
+.metric{background:var(--card);border-radius:var(--r2);padding:.9rem 1rem;border:1px solid var(--border);position:relative;overflow:hidden;}
 .metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
 .metric:nth-child(1)::before{background:linear-gradient(90deg,var(--blue-m),#60A5FA);}
 .metric:nth-child(2)::before{background:linear-gradient(90deg,var(--green-m),#34D399);}
 .metric:nth-child(3)::before{background:linear-gradient(90deg,#D97706,#FBBF24);}
 .metric:nth-child(4)::before{background:linear-gradient(90deg,var(--teal),#2DD4BF);}
 .metric:nth-child(5)::before{background:linear-gradient(90deg,var(--purple),#A78BFA);}
-.ml{font-size:11px;color:var(--subtle);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:4px;}
-.mv{font-size:22px;font-weight:600;color:var(--text);}
+.metric:nth-child(6)::before{background:linear-gradient(90deg,var(--bank),#C4B5FD);}
+.ml{font-size:11px;color:var(--subtle);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;margin-top:4px;}
+.mv{font-size:20px;font-weight:600;color:var(--text);}
 .ms{font-size:11px;color:var(--subtle);margin-top:3px;}
+
+/* Bank withdraw */
+.bank-panel{background:var(--bank-l);border:1px solid var(--bank);border-radius:var(--r2);padding:1.25rem;margin-bottom:1rem;display:none;}
+.bank-panel.open{display:block;}
+.bank-panel-title{font-size:14px;font-weight:600;color:var(--bank);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.bank-history{margin-top:12px;}
+.bank-history-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.bank-history-row:last-child{border-bottom:none;}
 
 /* Section */
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;}
@@ -103,9 +115,7 @@ body.dark .ot-alert{background:#451A03;border-color:#B45309;color:#FDE68A;}
 .bulk-count{font-size:13px;font-weight:600;color:var(--blue);flex:1;}
 .bulk-btn{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:6px 14px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;}
 .bulk-edit-btn{background:var(--orange-l);color:var(--orange);}
-.bulk-edit-btn:hover{background:#FED7AA;}
 .bulk-del-btn{background:var(--red);color:#fff;}
-.bulk-del-btn:hover{background:#B91C1C;}
 .bulk-cancel-btn{background:transparent;color:var(--blue);border:1px solid var(--blue-m)!important;border-radius:var(--r);}
 
 /* Bulk edit panel */
@@ -117,7 +127,6 @@ body.dark .ot-alert{background:#451A03;border-color:#B45309;color:#FDE68A;}
 .form-card.open{display:block;}
 .form-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .form-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
-.form-title i{color:var(--blue-m);}
 .form-close{background:none;border:none;cursor:pointer;color:var(--subtle);font-size:18px;padding:2px;}
 .form-close:hover{color:var(--text);}
 .form-section{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--subtle);margin-bottom:8px;}
@@ -127,23 +136,34 @@ body.dark .ot-alert{background:#451A03;border-color:#B45309;color:#FDE68A;}
 .fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);width:100%;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;}
 body.dark .fg input,body.dark .fg select,body.dark .fg textarea{background:#0F172A;}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue-m);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
-.fg textarea{resize:vertical;min-height:56px;}
+.fg textarea{resize:vertical;min-height:52px;}
 .field-hint{font-size:10px;color:var(--green-m);font-weight:500;margin-top:2px;display:flex;align-items:center;gap:3px;min-height:14px;}
-.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+
+/* Bank checkbox */
+.bank-toggle{display:flex;align-items:flex-start;gap:10px;background:var(--bank-l);border:1px solid var(--bank);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;}
+.bank-toggle input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--bank);margin-top:2px;flex-shrink:0;}
+.bank-toggle-label{font-size:13px;font-weight:500;color:var(--bank);}
+.bank-toggle-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* Travel section */
 .travel-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:10px;user-select:none;font-weight:500;}
 .travel-toggle input{cursor:pointer;accent-color:var(--blue-m);}
 .travel-fields{display:none;}
 .travel-fields.show{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;}
+
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
 .btn-save{background:linear-gradient(135deg,var(--blue-m),var(--green-m));color:#fff;border:none;padding:9px 24px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
 .btn-save:hover{opacity:.9;}
-.btn-orange{background:var(--orange);color:#fff;border:none;padding:9px 24px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-bank{background:linear-gradient(135deg,var(--bank),#7C3AED);color:#fff;border:none;padding:9px 24px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
 .btn-cancel{background:transparent;border:1px solid var(--border);padding:9px 16px;border-radius:var(--r);font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit;}
 .btn-cancel:hover{background:var(--bg);}
+.btn-purple{background:var(--bank);color:#fff;border:none;padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.btn-orange{background:var(--orange);color:#fff;border:none;padding:9px 24px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
 
 /* Table */
 .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px;}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:960px;}
 th{text-align:left;font-size:10px;font-weight:600;color:var(--subtle);padding:10px 10px;border-bottom:1px solid var(--border);white-space:nowrap;background:linear-gradient(180deg,#FAFAF8,#F5F2EE);text-transform:uppercase;letter-spacing:.5px;}
 body.dark th{background:linear-gradient(180deg,#1E293B,#0F172A);}
 td{padding:10px 10px;border-bottom:1px solid #F0EDE8;color:var(--text);vertical-align:middle;}
@@ -153,7 +173,8 @@ tr.selected td{background:#EFF6FF!important;}
 body.dark tr.selected td{background:#1E3A5F!important;}
 tr:hover td{background:#FAFAF8;}
 body.dark tr:hover td{background:#1E293B;}
-tr.ot-row td{border-left:3px solid #F59E0B;}
+tr.banked-row td{border-left:3px solid var(--bank);}
+tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent);}
 .row-cb{width:16px;height:16px;cursor:pointer;accent-color:var(--blue-m);}
 .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;}
 .b-unpaid{background:var(--amber-l);color:var(--amber);}
@@ -162,29 +183,27 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
 .b-ot{background:var(--rose-l);color:var(--rose);}
 .b-travel{background:var(--purple-l);color:var(--purple);}
 .b-tag{background:var(--teal-l);color:var(--teal);cursor:pointer;}
+.b-bank{background:var(--bank-l);color:var(--bank);}
 .inv-sel{font-size:11px;background:transparent;border:1px solid var(--border);border-radius:99px;padding:2px 8px;color:var(--text);cursor:pointer;font-family:inherit;}
-.act-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:none;cursor:pointer;font-size:16px;transition:all .15s;font-weight:600;}
-.act-btn.edit{background:var(--blue-l);color:var(--blue-m);border:1px solid var(--blue-m);}
-.act-btn.edit:hover{background:var(--blue-m);color:#fff;}
-.act-btn.dup{background:var(--green-l);color:var(--green-m);border:1px solid var(--green-m);}
-.act-btn.dup:hover{background:var(--green-m);color:#fff;}
-.act-btn.del{background:var(--red-l);color:var(--red);border:1px solid var(--red);}
-.act-btn.del:hover{background:var(--red);color:#fff;}
+.act-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:16px;transition:all .15s;background:var(--card);}
+.act-btn:hover{transform:scale(1.12);border-color:transparent;}
+.act-btn.edit:hover{background:var(--blue-l);}
+.act-btn.dup:hover{background:var(--green-l);}
+.act-btn.del:hover{background:var(--red-l);}
 .actions-cell{display:flex;gap:5px;align-items:center;}
-.actions-cell{display:flex;gap:3px;align-items:center;}
 .empty{text-align:center;color:var(--subtle);font-size:13px;padding:3rem 0;}
 .note-cell{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px;}
 .travel-cell{font-size:11px;color:var(--muted);}
 .amount{font-weight:600;}
+.breakdown{font-size:10px;color:var(--subtle);margin-top:2px;}
 
-/* Mileage / Pay period report modal */
+/* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;}
 .modal-overlay.open{display:flex;}
-.modal{background:var(--card);border-radius:var(--r2);padding:1.5rem;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.2);}
+.modal{background:var(--card);border-radius:var(--r2);padding:1.5rem;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.2);}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
 .modal-header h3{font-size:17px;font-weight:600;}
 .modal-close{background:none;border:none;cursor:pointer;color:var(--subtle);font-size:20px;}
-.modal-close:hover{color:var(--text);}
 .report-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:.75rem;}
 .report-table th{text-align:left;font-size:11px;color:var(--subtle);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);text-transform:uppercase;}
 .report-table td{padding:8px 8px;border-bottom:1px solid var(--border);color:var(--text);}
@@ -195,13 +214,13 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
 .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem;}
 .btn-print{background:var(--text);color:var(--card);border:none;padding:8px 18px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
 
-/* Invoice modal */
+/* Invoice */
 .invoice-box{background:#fff;color:#111;border:1px solid #ddd;border-radius:var(--r2);padding:2rem;margin-top:1rem;}
 .inv-header{display:flex;justify-content:space-between;margin-bottom:1.5rem;}
-.inv-title{font-size:28px;font-weight:700;color:#111;}
+.inv-title{font-size:28px;font-weight:700;}
 .inv-meta{font-size:12px;color:#666;line-height:1.8;}
 .inv-table{width:100%;border-collapse:collapse;font-size:13px;margin:1rem 0;}
-.inv-table th{text-align:left;padding:8px 10px;background:#f5f5f5;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #ddd;}
+.inv-table th{text-align:left;padding:8px 10px;background:#f5f5f5;font-size:11px;font-weight:600;text-transform:uppercase;border-bottom:2px solid #ddd;}
 .inv-table td{padding:8px 10px;border-bottom:1px solid #eee;}
 .inv-totals{text-align:right;margin-top:1rem;}
 .inv-totals div{display:flex;justify-content:flex-end;gap:24px;padding:4px 0;font-size:13px;}
@@ -212,12 +231,13 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
 .toast{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,var(--blue-m),var(--green-m));color:#fff;padding:11px 20px;border-radius:var(--r);font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;box-shadow:0 4px 16px rgba(37,99,235,.3);display:flex;align-items:center;gap:8px;}
 .toast.show{opacity:1;}
 
-@media print{.modal-actions,.header,.controls,.metrics,.section-head,.bulk-bar,.bulk-edit-panel,.form-card,.table-wrap,.toast,.modal-close,button{display:none!important;}.modal-overlay{position:static;background:none;padding:0;}.modal{box-shadow:none;max-height:none;padding:0;}.invoice-box{border:none;}}
-@media(max-width:600px){.app{padding:1rem .75rem 3rem;}.metrics{grid-template-columns:repeat(2,1fr);}.mv{font-size:18px;}.header{flex-direction:column;}}
+@media print{.modal-actions,.header,.controls,.filters,.metrics,.section-head,.bulk-bar,.bulk-edit-panel,.form-card,.table-wrap,.toast,.modal-close,.bank-panel,button{display:none!important;}.modal-overlay{position:static;background:none;padding:0;}.modal{box-shadow:none;max-height:none;padding:0;}.invoice-box{border:none;}}
+@media(max-width:640px){.app{padding:1rem .75rem 3rem;}.metrics{grid-template-columns:repeat(2,1fr);}.mv{font-size:18px;}.header{flex-direction:column;}}
 </style>
 </head>
 <body>
 <div class="app">
+
   <div class="header">
     <div class="header-left">
       <h1><i class="ti ti-chart-bar" style="font-size:24px;vertical-align:-3px;margin-right:6px;-webkit-text-fill-color:initial;color:var(--blue-m);"></i>Work Tracker</h1>
@@ -226,11 +246,9 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
     <div class="header-right">
       <div class="last-saved" id="last-saved"><i class="ti ti-clock"></i> Not saved yet</div>
       <div class="header-actions">
-        <!-- Dark mode -->
-        <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Toggle dark mode"><i class="ti ti-moon"></i></button>
-        <!-- Export -->
+        <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Dark mode"><i class="ti ti-moon"></i></button>
         <div class="export-wrap">
-          <button class="icon-btn" onclick="toggleExportMenu()" title="Export / Reports"><i class="ti ti-download"></i></button>
+          <button class="icon-btn" onclick="toggleExportMenu()" title="Export &amp; Reports"><i class="ti ti-download"></i></button>
           <div class="export-menu" id="export-menu">
             <p class="em-label">Export</p>
             <div class="em-item" onclick="exportCSV()"><i class="ti ti-file-spreadsheet" style="color:var(--green-m);"></i> Download CSV</div>
@@ -238,18 +256,34 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
             <p class="em-label">Reports</p>
             <div class="em-item" onclick="showMileageReport()"><i class="ti ti-car" style="color:var(--purple);"></i> Mileage report</div>
             <div class="em-item" onclick="showPayPeriodReport()"><i class="ti ti-calendar-stats" style="color:var(--blue-m);"></i> Pay period summary</div>
+            <div class="em-item" onclick="showBankReport()"><i class="ti ti-piggy-bank" style="color:var(--bank);"></i> Hour bank history</div>
             <div class="em-item" onclick="showInvoice()"><i class="ti ti-receipt" style="color:var(--teal);"></i> Generate invoice</div>
           </div>
         </div>
+        <button class="icon-btn" onclick="toggleBankPanel()" title="Hour bank"><i class="ti ti-piggy-bank" style="color:var(--bank);"></i></button>
         <button class="add-btn" onclick="openForm()"><i class="ti ti-plus"></i> Add entry</button>
       </div>
     </div>
   </div>
 
-  <!-- OT Alert -->
-  <div class="ot-alert" id="ot-alert">
-    <i class="ti ti-alert-triangle"></i>
-    <span id="ot-alert-msg"></span>
+  <!-- Alerts -->
+  <div class="alert-bar alert-ot" id="ot-alert"><i class="ti ti-alert-triangle"></i><span id="ot-alert-msg"></span></div>
+  <div class="alert-bar alert-bank" id="bank-alert"><i class="ti ti-piggy-bank"></i><span id="bank-alert-msg"></span></div>
+
+  <!-- Hour Bank Panel -->
+  <div class="bank-panel" id="bank-panel">
+    <div class="bank-panel-title"><i class="ti ti-piggy-bank"></i> Hour Bank</div>
+    <div class="form-grid" style="margin-bottom:10px;">
+      <div class="fg"><label>Withdraw hours</label><input type="number" id="bank-withdraw-hours" placeholder="e.g. 8" min="0" step="0.25"/></div>
+      <div class="fg"><label>Date of payout</label><input type="date" id="bank-withdraw-date"/></div>
+      <div class="fg"><label>Rate ($)</label><input type="number" id="bank-withdraw-rate" placeholder="Your hourly rate" min="0" step="0.01"/></div>
+      <div class="fg"><label>Note</label><input type="text" id="bank-withdraw-note" placeholder="e.g. Vacation week"/></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button class="btn-purple" onclick="recordWithdrawal()"><i class="ti ti-check"></i> Record withdrawal</button>
+      <span style="font-size:12px;color:var(--muted);">This will reduce your banked hours balance.</span>
+    </div>
+    <div class="bank-history" id="bank-history"></div>
   </div>
 
   <div class="controls">
@@ -282,7 +316,6 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
     </div>
   </div>
 
-  <!-- Filters -->
   <div class="filters">
     <select class="filter-select" id="filter-tag" onchange="render()"><option value="">All projects/tags</option></select>
     <select class="filter-select" id="filter-inv" onchange="render()">
@@ -291,39 +324,51 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
       <option value="sent">Sent</option>
       <option value="paid">Paid</option>
     </select>
+    <select class="filter-select" id="filter-bank" onchange="render()">
+      <option value="">All entries</option>
+      <option value="banked">Banked only</option>
+      <option value="paid">Paid only</option>
+    </select>
     <div class="ot-threshold-wrap">
       <i class="ti ti-alert-triangle" style="color:#D97706;"></i>
-      <span>OT alert after</span>
+      <span>OT after</span>
       <input type="number" id="ot-threshold" value="40" min="1" max="80" step="1" onchange="render()"/>
       <span>h/week</span>
     </div>
   </div>
 
+  <!-- 6 metric cards -->
   <div class="metrics">
     <div class="metric"><p class="ml">Total hours</p><p class="mv" id="m-hours">0h</p><p class="ms" id="m-ot">0h overtime</p></div>
-    <div class="metric"><p class="ml">Hourly earnings</p><p class="mv" id="m-earn">$0.00</p></div>
+    <div class="metric"><p class="ml">Hourly pay</p><p class="mv" id="m-earn">$0.00</p><p class="ms" id="m-earn-sub"></p></div>
+    <div class="metric"><p class="ml">KM reimb.</p><p class="mv" id="m-km-earn">$0.00</p><p class="ms" id="m-km">0 km</p></div>
     <div class="metric"><p class="ml">Expenses</p><p class="mv" id="m-exp">$0.00</p></div>
-    <div class="metric"><p class="ml">Travel</p><p class="mv" id="m-km">0 km</p><p class="ms" id="m-ttime">— travel</p></div>
-    <div class="metric"><p class="ml">Total</p><p class="mv" id="m-total">$0.00</p><p class="ms" id="m-outstanding">$0.00 outstanding</p></div>
+    <div class="metric"><p class="ml">Total paid</p><p class="mv" id="m-total">$0.00</p><p class="ms" id="m-outstanding">$0.00 outstanding</p></div>
+    <div class="metric" style="cursor:pointer;" onclick="toggleBankPanel()" title="Click to manage bank">
+      <p class="ml">🏦 Banked hrs</p>
+      <p class="mv" id="m-bank" style="color:var(--bank);">0h</p>
+      <p class="ms" id="m-bank-sub">Click to withdraw</p>
+    </div>
   </div>
 
   <div class="section-head">
     <h2>Time log</h2>
-    <span class="select-hint">Hold <kbd style="font-size:10px;background:#eee;padding:1px 5px;border-radius:3px;border:1px solid #ccc;">Shift</kbd> + click rows to multi-select</span>
+    <span class="select-hint">Hold <kbd style="font-size:10px;background:#eee;padding:1px 5px;border-radius:3px;border:1px solid #ccc;">Shift</kbd> + click to multi-select</span>
   </div>
 
+  <!-- Bulk bar -->
   <div class="bulk-bar" id="bulk-bar">
     <span class="bulk-count" id="bulk-count">0 selected</span>
     <button class="bulk-btn bulk-cancel-btn" onclick="clearSelection()">Clear</button>
-    <button class="bulk-btn bulk-edit-btn" onclick="openBulkEdit()"><i class="ti ti-pencil"></i> Bulk edit</button>
-    <button class="bulk-btn" style="background:var(--teal-l);color:var(--teal);" onclick="showInvoice()"><i class="ti ti-receipt"></i> Invoice selected</button>
-    <button class="bulk-btn bulk-del-btn" onclick="bulkDelete()"><i class="ti ti-trash"></i> Delete selected</button>
+    <button class="bulk-btn bulk-edit-btn" onclick="openBulkEdit()">✏️ Bulk edit</button>
+    <button class="bulk-btn" style="background:var(--teal-l);color:var(--teal);" onclick="showInvoice()">🧾 Invoice</button>
+    <button class="bulk-btn bulk-del-btn" onclick="bulkDelete()">🗑️ Delete</button>
   </div>
 
   <!-- Bulk edit panel -->
   <div class="bulk-edit-panel" id="bulk-edit-panel">
     <div class="form-top">
-      <p class="form-title" style="color:var(--orange);"><i class="ti ti-edit"></i> Bulk edit <span id="bulk-edit-count"></span></p>
+      <p class="form-title" style="color:var(--orange);">✏️ Bulk edit <span id="bulk-edit-count"></span></p>
       <button class="form-close" onclick="closeBulkEdit()"><i class="ti ti-x"></i></button>
     </div>
     <p style="font-size:12px;color:var(--orange);margin-bottom:10px;font-style:italic;">Only fill fields you want to change — blank fields keep each entry's existing value.</p>
@@ -341,33 +386,49 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
     </div>
   </div>
 
-  <!-- Single entry form -->
+  <!-- Entry form -->
   <div class="form-card" id="entry-form">
     <div class="form-top">
-      <p class="form-title" id="form-title"><i class="ti ti-plus"></i> New entry</p>
+      <p class="form-title" id="form-title"><i class="ti ti-plus" style="color:var(--blue-m);"></i> New entry</p>
       <button class="form-close" onclick="closeForm()"><i class="ti ti-x"></i></button>
     </div>
+
+    <!-- Bank hours checkbox -->
+    <div class="bank-toggle">
+      <input type="checkbox" id="f-bank" onchange="updateFormCalc()"/>
+      <div>
+        <div class="bank-toggle-label">🏦 Bank these hours</div>
+        <div class="bank-toggle-sub">Worked hours go into the bank. You'll only be paid for displacement time + km reimbursement today.</div>
+      </div>
+    </div>
+
     <p class="form-section">Work details</p>
     <div class="form-grid">
       <div class="fg"><label>Date</label><input type="date" id="f-date"/></div>
-      <div class="fg"><label>Regular hours</label><input type="number" id="f-hours" placeholder="0" min="0" step="0.25"/><span class="field-hint" id="hint-hours"></span></div>
-      <div class="fg"><label>Overtime hours</label><input type="number" id="f-ot" placeholder="0" min="0" step="0.25"/><span class="field-hint" id="hint-ot"></span></div>
-      <div class="fg"><label>Hourly rate ($)</label><input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01"/><span class="field-hint" id="hint-rate"></span></div>
-      <div class="fg"><label>OT multiplier</label><select id="f-otm"><option value="1.5">1.5× time &amp; half</option><option value="2">2× double time</option><option value="1">1× same rate</option></select><span class="field-hint" id="hint-otm"></span></div>
-      <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01"/><span class="field-hint" id="hint-exp"></span></div>
+      <div class="fg"><label>Regular hours worked</label><input type="number" id="f-hours" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-hours"></span></div>
+      <div class="fg"><label>Overtime hours</label><input type="number" id="f-ot" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-ot"></span></div>
+      <div class="fg"><label>Hourly rate ($)</label><input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-rate"></span></div>
+      <div class="fg"><label>OT multiplier</label><select id="f-otm" onchange="updateFormCalc()"><option value="1.5">1.5× time &amp; half</option><option value="2">2× double time</option><option value="1">1× same rate</option></select><span class="field-hint" id="hint-otm"></span></div>
+      <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-exp"></span></div>
       <div class="fg"><label>Location</label><input type="text" id="f-loc" placeholder="Office, remote…"/><span class="field-hint" id="hint-loc"></span></div>
       <div class="fg"><label>Invoice status</label><select id="f-inv"><option value="unpaid">Unpaid</option><option value="sent">Invoice sent</option><option value="paid">Paid</option></select><span class="field-hint" id="hint-inv"></span></div>
-      <div class="fg"><label>Project / Tag</label><input type="text" id="f-tag" placeholder="e.g. Client A, Project X"/><span class="field-hint" id="hint-tag"></span></div>
+      <div class="fg"><label>Project / Tag</label><input type="text" id="f-tag" placeholder="e.g. Client A"/><span class="field-hint" id="hint-tag"></span></div>
     </div>
     <div class="fg" style="margin-bottom:12px;"><label>Notes</label><textarea id="f-note" placeholder="Task, project, description…"></textarea></div>
+
     <hr class="divider"/>
     <label class="travel-toggle"><input type="checkbox" id="f-travel-chk" onchange="toggleTravel(this.checked)"><i class="ti ti-car"></i> Displacement from home base</label>
     <div class="travel-fields" id="travel-fields">
-      <div class="fg"><label>Distance (km)</label><input type="number" id="f-km" placeholder="0" min="0" step="0.1"/><span class="field-hint" id="hint-km"></span></div>
-      <div class="fg"><label>Travel time (min)</label><input type="number" id="f-tmin" placeholder="0" min="0" step="1"/><span class="field-hint" id="hint-tmin"></span></div>
+      <div class="fg"><label>Travel time (hours)</label><input type="number" id="f-tmin" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-tmin"></span></div>
+      <div class="fg"><label>Distance (km)</label><input type="number" id="f-km" placeholder="0" min="0" step="0.1" oninput="updateFormCalc()"/><span class="field-hint" id="hint-km"></span></div>
+      <div class="fg"><label>Travel rate ($/km)</label><input type="number" id="f-krate" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-krate"></span></div>
       <div class="fg"><label>Destination</label><input type="text" id="f-dest" placeholder="Client site, city…"/><span class="field-hint" id="hint-dest"></span></div>
-      <div class="fg"><label>Travel rate ($/km)</label><input type="number" id="f-krate" placeholder="0.00" min="0" step="0.01"/><span class="field-hint" id="hint-krate"></span></div>
     </div>
+
+    <!-- Live calculation preview -->
+    <div id="calc-preview" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-top:10px;font-size:12px;line-height:1.9;">
+    </div>
+
     <div class="form-actions">
       <button class="btn-cancel" onclick="closeForm()">Cancel</button>
       <button class="btn-save" id="btn-save" onclick="saveEntry()"><i class="ti ti-device-floppy"></i> Save entry</button>
@@ -379,13 +440,14 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
       <thead><tr>
         <th style="width:36px;"><input type="checkbox" id="select-all" class="row-cb" onchange="toggleSelectAll(this.checked)"/></th>
         <th style="width:90px;">Date</th>
-        <th style="width:70px;">Hours</th>
+        <th style="width:68px;">Hours</th>
         <th style="width:64px;">Rate</th>
-        <th style="width:66px;">Expenses</th>
-        <th style="width:78px;">Total</th>
+        <th style="width:70px;">Hrly pay</th>
+        <th style="width:70px;">KM reimb.</th>
+        <th style="width:68px;">Expenses</th>
+        <th style="width:76px;">Total paid</th>
         <th style="width:78px;">Location</th>
-        <th style="width:80px;">Tag</th>
-        <th style="width:104px;">Travel</th>
+        <th style="width:70px;">Tag</th>
         <th style="width:80px;">Invoice</th>
         <th>Notes</th>
         <th style="width:100px;min-width:100px;">Actions</th>
@@ -395,7 +457,7 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
   </div>
 </div>
 
-<!-- Reports Modal -->
+<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div class="modal-header">
@@ -403,9 +465,7 @@ tr.ot-row td{border-left:3px solid #F59E0B;}
       <button class="modal-close" onclick="closeModalDirect()"><i class="ti ti-x"></i></button>
     </div>
     <div id="modal-body"></div>
-    <div class="modal-actions" id="modal-actions">
-      <button class="btn-print" onclick="window.print()"><i class="ti ti-printer"></i> Print / Save PDF</button>
-    </div>
+    <div class="modal-actions"><button class="btn-print" onclick="window.print()"><i class="ti ti-printer"></i> Print / Save PDF</button></div>
   </div>
 </div>
 
@@ -416,9 +476,11 @@ const SUPA_URL='https://nrbysuqucownhfwoxifm.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yYnlzdXF1Y293bmhmd294aWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4OTk4NDUsImV4cCI6MjA5NDQ3NTg0NX0.89sniavjSfb2f_y_bQ3H243z5Q__LysRWmMskW5Na1A';
 const H={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 const LK={rate:'wt_rate',otm:'wt_otm',exp:'wt_exp',loc:'wt_loc',inv:'wt_inv',km:'wt_km',tmin:'wt_tmin',dest:'wt_dest',krate:'wt_krate',hours:'wt_hours',ot:'wt_ot',tag:'wt_tag'};
+const BANK_KEY='wt_bank_withdrawals';
 
 let entries=[],currentPeriod='week',periodOffset=0,editId=null,selectedIds=new Set(),lastClickedIdx=null;
 
+// ── Supabase ──────────────────────────────────────────────
 async function apiFetch(path,opts={}){
   const res=await fetch(SUPA_URL+'/rest/v1/'+path,{...opts,headers:{...H,...(opts.headers||{})}});
   if(res.status===204)return null;
@@ -429,8 +491,78 @@ async function apiFetch(path,opts={}){
 
 async function loadEntries(){
   try{const d=await apiFetch('entries?select=*&order=date.desc');entries=d||[];}
-  catch(e){showToast('Error loading');entries=[];}
+  catch(e){showToast('Error loading data');entries=[];}
   updateTagFilter();selectedIds.clear();updateBulkBar();render();
+}
+
+// ── Calculation engine ────────────────────────────────────
+// Formula:
+// Normal day: (hours + ot) * rate [+ ot premium] + expenses = hourly_pay
+// Displacement day: (hours + ot + travel_hours) * rate [+ ot premium] + km*krate + expenses
+//   If banking: only travel_hours * rate + km*krate + expenses = paid; hours go to bank
+// km reimb is always separate from hourly pay
+
+function calcEntry(hours, ot, rate, otm, exp, km, tmin_h, krate, banking, hasTrav){
+  const reg_h   = parseFloat(hours)||0;
+  const ot_h    = parseFloat(ot)||0;
+  const r       = parseFloat(rate)||0;
+  const om      = parseFloat(otm)||1;
+  const expense = parseFloat(exp)||0;
+  const km_val  = parseFloat(km)||0;
+  const trav_h  = hasTrav?(parseFloat(tmin_h)||0):0;
+  const kr      = parseFloat(krate)||0;
+
+  const km_reimb  = km_val * kr;
+  const banked_h  = banking ? reg_h + ot_h : 0;
+
+  let hrly_pay;
+  if(banking){
+    // Only paid for travel time today
+    hrly_pay = trav_h * r;
+  } else {
+    // Paid for work + overtime premium + travel time
+    const base_h = reg_h + trav_h;
+    hrly_pay = base_h * r + ot_h * r * om;
+  }
+
+  const total_paid = hrly_pay + km_reimb + expense;
+  const total_hours_logged = reg_h + ot_h + trav_h;
+
+  return { hrly_pay, km_reimb, expense, total_paid, banked_h, total_hours_logged, reg_h, ot_h, trav_h, r, om, km_val, kr };
+}
+
+// ── Live form preview ─────────────────────────────────────
+function updateFormCalc(){
+  const banking = document.getElementById('f-bank').checked;
+  const hasTrav = document.getElementById('f-travel-chk').checked;
+  const c = calcEntry(
+    document.getElementById('f-hours').value,
+    document.getElementById('f-ot').value,
+    document.getElementById('f-rate').value,
+    document.getElementById('f-otm').value,
+    document.getElementById('f-exp').value,
+    hasTrav?document.getElementById('f-km').value:0,
+    hasTrav?document.getElementById('f-tmin').value:0,
+    hasTrav?document.getElementById('f-krate').value:0,
+    banking, hasTrav
+  );
+  const preview = document.getElementById('calc-preview');
+  if(!c.r){ preview.style.display='none'; return; }
+  preview.style.display='block';
+  let html='<strong>Calculation preview</strong><br>';
+  if(banking){
+    html+=`<span style="color:var(--bank);">🏦 Banking ${fmt_h(c.reg_h+c.ot_h)} — these hours go into your bank</span><br>`;
+    html+=`Travel time: ${fmt_h(c.trav_h)} × ${fmt(c.r)}/h = <strong>${fmt(c.trav_h*c.r)}</strong><br>`;
+  } else {
+    html+=`Work hours: ${fmt_h(c.reg_h)} × ${fmt(c.r)}/h = ${fmt(c.reg_h*c.r)}<br>`;
+    if(c.ot_h>0) html+=`Overtime: ${fmt_h(c.ot_h)} × ${fmt(c.r)} × ${c.om} = ${fmt(c.ot_h*c.r*c.om)}<br>`;
+    if(c.trav_h>0) html+=`Travel time: ${fmt_h(c.trav_h)} × ${fmt(c.r)}/h = ${fmt(c.trav_h*c.r)}<br>`;
+  }
+  if(c.km_val>0) html+=`KM reimb: ${c.km_val.toFixed(1)} km × ${fmt(c.kr)}/km = <strong>${fmt(c.km_reimb)}</strong><br>`;
+  if(c.expense>0) html+=`Expenses: ${fmt(c.expense)}<br>`;
+  html+=`<strong style="font-size:14px;">Total paid today: ${fmt(c.total_paid)}</strong>`;
+  if(c.banked_h>0) html+=`<br><span style="color:var(--bank);">+ ${fmt_h(c.banked_h)} added to hour bank</span>`;
+  preview.innerHTML=html;
 }
 
 // ── Dark mode ─────────────────────────────────────────────
@@ -446,7 +578,7 @@ if(localStorage.getItem('wt_dark')){document.body.classList.add('dark');document
 function saveLast(k,v){if(v!==''&&v!=null)localStorage.setItem(LK[k],String(v));}
 function getLast(k){return localStorage.getItem(LK[k])||'';}
 function fillHints(){
-  const fmtMap={rate:v=>'$'+parseFloat(v).toFixed(2)+'/h',otm:v=>v+'×',exp:v=>'$'+parseFloat(v).toFixed(2),km:v=>v+' km',tmin:v=>v+' min',krate:v=>'$'+parseFloat(v).toFixed(2)+'/km',hours:v=>v+'h',ot:v=>v+'h',loc:v=>v,dest:v=>v,inv:v=>v,tag:v=>v};
+  const fmtMap={rate:v=>'$'+parseFloat(v).toFixed(2)+'/h',otm:v=>v+'×',exp:v=>'$'+parseFloat(v).toFixed(2),km:v=>v+' km',tmin:v=>v+' h',krate:v=>'$'+parseFloat(v).toFixed(2)+'/km',hours:v=>v+'h',ot:v=>v+'h',loc:v=>v,dest:v=>v,inv:v=>v,tag:v=>v};
   Object.keys(LK).forEach(k=>{
     const v=getLast(k);const el=document.getElementById('hint-'+k);
     if(el)el.innerHTML=v&&fmtMap[k]?`<i class="ti ti-history" style="font-size:10px;"></i> Last: ${fmtMap[k](v)}`:'';
@@ -475,72 +607,77 @@ function updateTagFilter(){
 // ── Form ──────────────────────────────────────────────────
 function openForm(){
   closeBulkEdit();
-  document.getElementById('entry-form').classList.remove('open');
+  const form=document.getElementById('entry-form');
+  form.style.display='none';form.classList.remove('open');
   editId=null;clearForm();
-  document.getElementById('form-title').innerHTML='<i class="ti ti-plus"></i> New entry';
+  document.getElementById('form-title').innerHTML='<i class="ti ti-plus" style="color:var(--blue-m);"></i> New entry';
   document.getElementById('btn-save').innerHTML='<i class="ti ti-device-floppy"></i> Save entry';
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
   prefill();fillHints();
-  document.getElementById('entry-form').classList.add('open');
-  document.getElementById('entry-form').scrollIntoView({behavior:'smooth',block:'start'});
+  form.style.display='block';form.classList.add('open');
+  form.scrollIntoView({behavior:'smooth',block:'start'});
+  updateFormCalc();
 }
 
 function editEntry(id){
-  // Stop row-click from firing
   if(window.event)window.event.stopPropagation();
-  // Hide and reset the form completely first
-  const form = document.getElementById('entry-form');
-  form.classList.remove('open');
-  form.style.display = 'none';
-  editId = null;
-  clearForm();
-  // Find the entry
-  const e = entries.find(x => x.id === id);
-  if(!e){ showToast('Entry not found'); return; }
-  editId = id;
-  // Update form heading
-  document.getElementById('form-title').innerHTML = '<i class="ti ti-pencil"></i>&nbsp;Editing — ' + e.date;
-  document.getElementById('btn-save').innerHTML = '<i class="ti ti-check"></i>&nbsp;Update entry';
-  // Fill every field
-  document.getElementById('f-date').value  = e.date  || '';
-  document.getElementById('f-hours').value = e.hours != null ? e.hours : '';
-  document.getElementById('f-ot').value    = e.ot    != null ? e.ot    : '';
-  document.getElementById('f-rate').value  = e.rate  != null ? e.rate  : '';
-  document.getElementById('f-otm').value   = e.otm   ? String(e.otm)   : '1.5';
-  document.getElementById('f-exp').value   = e.exp   != null ? e.exp   : '';
-  document.getElementById('f-loc').value   = e.loc   || '';
-  document.getElementById('f-inv').value   = e.inv   || 'unpaid';
-  document.getElementById('f-note').value  = e.note  || '';
-  document.getElementById('f-tag').value   = e.tag   || '';
-  // Travel section
-  const hasTrav = (parseFloat(e.km) || 0) > 0;
-  document.getElementById('f-travel-chk').checked = hasTrav;
+  closeBulkEdit();
+  const form=document.getElementById('entry-form');
+  form.style.display='none';form.classList.remove('open');
+  clearForm();editId=null;
+  const e=entries.find(x=>x.id===id);
+  if(!e){showToast('Entry not found');return;}
+  editId=id;
+  document.getElementById('form-title').innerHTML='<i class="ti ti-pencil" style="color:var(--blue-m);"></i> Editing — '+e.date;
+  document.getElementById('btn-save').innerHTML='<i class="ti ti-check"></i> Update entry';
+  document.getElementById('f-date').value=e.date||'';
+  document.getElementById('f-hours').value=e.hours!=null?e.hours:'';
+  document.getElementById('f-ot').value=e.ot!=null?e.ot:'';
+  document.getElementById('f-rate').value=e.rate!=null?e.rate:'';
+  document.getElementById('f-otm').value=e.otm?String(e.otm):'1.5';
+  document.getElementById('f-exp').value=e.exp!=null?e.exp:'';
+  document.getElementById('f-loc').value=e.loc||'';
+  document.getElementById('f-inv').value=e.inv||'unpaid';
+  document.getElementById('f-note').value=e.note||'';
+  document.getElementById('f-tag').value=e.tag||'';
+  document.getElementById('f-bank').checked=e.banked||false;
+  const hasTrav=(parseFloat(e.km)||0)>0||(parseFloat(e.tmin)||0)>0;
+  document.getElementById('f-travel-chk').checked=hasTrav;
   toggleTravel(hasTrav);
   if(hasTrav){
-    document.getElementById('f-km').value    = e.km    || '';
-    document.getElementById('f-tmin').value  = e.tmin  || '';
-    document.getElementById('f-dest').value  = e.dest  || '';
-    document.getElementById('f-krate').value = e.krate || '';
+    document.getElementById('f-km').value=e.km||'';
+    document.getElementById('f-tmin').value=e.tmin||'';
+    document.getElementById('f-dest').value=e.dest||'';
+    document.getElementById('f-krate').value=e.krate||'';
   }
-  // Show the form
-  form.style.display = 'block';
-  form.classList.add('open');
-  // Scroll to form
-  setTimeout(function(){ form.scrollIntoView({behavior:'smooth', block:'start'}); }, 50);
+  form.style.display='block';form.classList.add('open');
+  setTimeout(()=>form.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  updateFormCalc();
 }
 
-function closeForm(){const f=document.getElementById('entry-form');f.classList.remove('open');f.style.display='';clearForm();editId=null;}
+function closeForm(){
+  const f=document.getElementById('entry-form');
+  f.classList.remove('open');f.style.display='';
+  clearForm();editId=null;
+}
 function clearForm(){
   ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('f-inv').value='unpaid';document.getElementById('f-otm').value='1.5';
+  document.getElementById('f-inv').value='unpaid';
+  document.getElementById('f-otm').value='1.5';
+  document.getElementById('f-bank').checked=false;
   document.getElementById('f-travel-chk').checked=false;
   Object.keys(LK).forEach(k=>{const el=document.getElementById('hint-'+k);if(el)el.innerHTML='';});
   toggleTravel(false);
+  document.getElementById('calc-preview').style.display='none';
 }
-function toggleTravel(on){document.getElementById('travel-fields').className='travel-fields'+(on?' show':'');}
+function toggleTravel(on){
+  document.getElementById('travel-fields').className='travel-fields'+(on?' show':'');
+  updateFormCalc();
+}
 
 async function saveEntry(){
-  const date=document.getElementById('f-date').value;if(!date){alert('Please enter a date.');return;}
+  const date=document.getElementById('f-date').value;
+  if(!date){alert('Please enter a date.');return;}
   const hours=parseFloat(document.getElementById('f-hours').value)||0;
   const ot=parseFloat(document.getElementById('f-ot').value)||0;
   const rate=parseFloat(document.getElementById('f-rate').value)||0;
@@ -550,26 +687,44 @@ async function saveEntry(){
   const inv=document.getElementById('f-inv').value;
   const note=document.getElementById('f-note').value.trim();
   const tag=document.getElementById('f-tag').value.trim();
+  const banking=document.getElementById('f-bank').checked;
   const hasTrav=document.getElementById('f-travel-chk').checked;
   const km=hasTrav?(parseFloat(document.getElementById('f-km').value)||0):0;
   const tmin=hasTrav?(parseFloat(document.getElementById('f-tmin').value)||0):0;
   const dest=hasTrav?document.getElementById('f-dest').value.trim():'';
   const krate=hasTrav?(parseFloat(document.getElementById('f-krate').value)||0):0;
-  const trav_earn=km*krate;
-  const earned=(hours*rate)+(ot*rate*otm)+exp+trav_earn;
-  const row={date,hours,ot,rate,otm,exp,loc,inv,note,km,tmin,dest,krate,trav_earn,earned};
-  if(window.hasTagCol)row.tag=tag;
+
+  const c=calcEntry(hours,ot,rate,otm,exp,km,tmin,krate,banking,hasTrav);
+
+  const row={
+    date,hours,ot,rate,otm,exp,loc,inv,note,tag,
+    km,tmin,dest,krate,
+    banked:banking,
+    banked_hours:c.banked_h,
+    trav_earn:c.km_reimb,
+    hrly_pay:c.hrly_pay,
+    earned:c.total_paid
+  };
+  if(window.hasTagCol===false)delete row.tag;
+
   saveLast('hours',hours);saveLast('ot',ot);saveLast('rate',rate);saveLast('otm',otm);
   saveLast('exp',exp);saveLast('loc',loc);saveLast('inv',inv);saveLast('tag',tag);
   if(km)saveLast('km',km);if(tmin)saveLast('tmin',tmin);if(dest)saveLast('dest',dest);if(krate)saveLast('krate',krate);
+
   try{
-    if(editId){await apiFetch('entries?id=eq.'+editId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});showToast('Entry updated');}
-    else{await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});showToast('Entry saved');}
+    if(editId){
+      await apiFetch('entries?id=eq.'+editId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+      showToast(banking?'Entry saved — hours banked 🏦':'Entry updated ✓');
+    }else{
+      await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+      showToast(banking?'Entry saved — hours banked 🏦':'Entry saved ✓');
+    }
     updateLastSaved();closeForm();await loadEntries();
   }catch(e){showToast('Error: '+e.message);}
 }
 
 async function duplicateEntry(id){
+  if(window.event)window.event.stopPropagation();
   const e=entries.find(x=>x.id===id);if(!e)return;
   const{id:_,created_at:__,...row}=e;
   row.date=new Date().toISOString().split('T')[0];
@@ -578,6 +733,7 @@ async function duplicateEntry(id){
 }
 
 async function deleteEntry(id){
+  if(window.event)window.event.stopPropagation();
   if(!confirm('Delete this entry?'))return;
   try{await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast('Entry deleted');await loadEntries();}
   catch(e){showToast('Error deleting');}
@@ -588,15 +744,77 @@ async function updateInv(id,val){
   catch(e){showToast('Error updating');}
 }
 
+// ── Hour Bank ─────────────────────────────────────────────
+function getWithdrawals(){try{return JSON.parse(localStorage.getItem(BANK_KEY)||'[]');}catch(e){return[];}}
+function saveWithdrawals(w){localStorage.setItem(BANK_KEY,JSON.stringify(w));}
+
+function getTotalBanked(){
+  const bankedIn=entries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const withdrawn=getWithdrawals().reduce((s,w)=>s+w.hours,0);
+  return Math.max(0,bankedIn-withdrawn);
+}
+
+function recordWithdrawal(){
+  const hours=parseFloat(document.getElementById('bank-withdraw-hours').value)||0;
+  const date=document.getElementById('bank-withdraw-date').value;
+  const rate=parseFloat(document.getElementById('bank-withdraw-rate').value)||0;
+  const note=document.getElementById('bank-withdraw-note').value.trim();
+  if(!hours||!date){alert('Please enter hours and date.');return;}
+  const balance=getTotalBanked();
+  if(hours>balance){alert(`You only have ${fmt_h(balance)} banked. Cannot withdraw ${fmt_h(hours)}.`);return;}
+  const withdrawals=getWithdrawals();
+  withdrawals.push({id:Date.now(),hours,date,rate,note,payout:hours*rate});
+  saveWithdrawals(withdrawals);
+  document.getElementById('bank-withdraw-hours').value='';
+  document.getElementById('bank-withdraw-note').value='';
+  showToast(`${fmt_h(hours)} withdrawn from bank`);
+  renderBankPanel();render();
+}
+
+function deleteWithdrawal(id){
+  if(!confirm('Remove this withdrawal record?'))return;
+  const w=getWithdrawals().filter(x=>x.id!==id);
+  saveWithdrawals(w);renderBankPanel();render();
+}
+
+function toggleBankPanel(){
+  const p=document.getElementById('bank-panel');
+  const open=p.classList.toggle('open');
+  if(open){
+    renderBankPanel();
+    const rate=getLast('rate');
+    if(rate)document.getElementById('bank-withdraw-rate').value=rate;
+    document.getElementById('bank-withdraw-date').value=new Date().toISOString().split('T')[0];
+    p.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+function renderBankPanel(){
+  const w=getWithdrawals().sort((a,b)=>b.date.localeCompare(a.date));
+  const hist=document.getElementById('bank-history');
+  if(!w.length){hist.innerHTML='<p style="font-size:12px;color:var(--subtle);padding-top:10px;">No withdrawals recorded yet.</p>';return;}
+  hist.innerHTML='<p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-top:12px;margin-bottom:6px;">Withdrawal history</p>'+
+    w.map(x=>`<div class="bank-history-row">
+      <span>${x.date} — ${fmt_h(x.hours)}${x.note?' ('+x.note+')':''}</span>
+      <span style="display:flex;align-items:center;gap:10px;">
+        ${x.payout>0?'<span style="color:var(--green-m);font-weight:600;">'+fmt(x.payout)+'</span>':''}
+        <button onclick="deleteWithdrawal(${x.id})" style="background:none;border:none;cursor:pointer;color:var(--subtle);font-size:14px;" title="Remove">✕</button>
+      </span>
+    </div>`).join('');
+}
+
 // ── Bulk ──────────────────────────────────────────────────
 function getFiltered(){
   const{start,end}=getPeriodRange(currentPeriod,periodOffset);
   const tagF=document.getElementById('filter-tag').value;
   const invF=document.getElementById('filter-inv').value;
+  const bankF=document.getElementById('filter-bank').value;
   return entries.filter(e=>{
     if(e.date<start||e.date>end)return false;
     if(tagF&&(e.tag||'')!==tagF)return false;
     if(invF&&e.inv!==invF)return false;
+    if(bankF==='banked'&&!e.banked)return false;
+    if(bankF==='paid'&&e.banked)return false;
     return true;
   });
 }
@@ -626,7 +844,6 @@ function openBulkEdit(){
   document.getElementById('bulk-edit-panel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function closeBulkEdit(){document.getElementById('bulk-edit-panel').classList.remove('open');}
-
 async function applyBulkEdit(){
   const rate=document.getElementById('be-rate').value;
   const otm=document.getElementById('be-otm').value;
@@ -642,14 +859,16 @@ async function applyBulkEdit(){
       const e=entries.find(x=>x.id===id);if(!e)continue;
       const u={};
       if(rate)u.rate=parseFloat(rate);if(otm)u.otm=parseFloat(otm);
-      if(inv)u.inv=inv;if(loc)u.loc=loc;if(window.hasTagCol&&tag)u.tag=tag;if(krate)u.krate=parseFloat(krate);
-      if(rate||otm){const r=u.rate||e.rate||0;const o=u.otm||e.otm||1;u.earned=(e.hours||0)*r+(e.ot||0)*r*o+(e.exp||0)+(e.km||0)*(u.krate||e.krate||0);u.trav_earn=(e.km||0)*(u.krate||e.krate||0);}
+      if(inv)u.inv=inv;if(loc)u.loc=loc;if(tag&&window.hasTagCol!==false)u.tag=tag;if(krate)u.krate=parseFloat(krate);
+      if(rate||otm||krate){
+        const c=calcEntry(e.hours,e.ot,u.rate||e.rate,u.otm||e.otm,e.exp,e.km,e.tmin,u.krate||e.krate,e.banked,(e.km||0)>0||(e.tmin||0)>0);
+        u.hrly_pay=c.hrly_pay;u.trav_earn=c.km_reimb;u.earned=c.total_paid;
+      }
       await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(u)});
     }
     showToast(n+' entr'+(n===1?'y':'ies')+' updated');updateLastSaved();closeBulkEdit();clearSelection();await loadEntries();
   }catch(e){showToast('Error: '+e.message);}
 }
-
 async function bulkDelete(){
   const n=selectedIds.size;if(!n)return;
   if(!confirm(`Delete ${n} entr${n===1?'y':'ies'}?`))return;
@@ -657,78 +876,99 @@ async function bulkDelete(){
   catch(e){showToast('Error deleting');}
 }
 
-// ── Export CSV ────────────────────────────────────────────
+// ── Reports ───────────────────────────────────────────────
 function exportCSV(){
-  const heads=['Date','Regular Hours','OT Hours','Rate','OT Mult','Expenses','Location','Tag','Invoice','Notes','Travel KM','Travel Min','Destination','Travel Rate','Travel Earn','Total'];
-  const rows=entries.map(e=>[e.date,e.hours,e.ot,e.rate,e.otm,e.exp,e.loc,e.tag||'',e.inv,'"'+(e.note||'').replace(/"/g,"'")+'"',e.km,e.tmin,e.dest||'',e.krate,e.trav_earn,e.earned]);
+  const heads=['Date','Hours','OT','Rate','OT Mult','Hrly Pay','KM','Travel h','KM Rate','KM Reimb','Expenses','Total Paid','Banked','Banked Hours','Location','Tag','Invoice','Notes'];
+  const rows=entries.map(e=>[e.date,e.hours,e.ot,e.rate,e.otm,e.hrly_pay||'',e.km,e.tmin,e.krate,e.trav_earn||'',e.exp,e.earned,e.banked?'YES':'',e.banked_hours||0,e.loc,e.tag||'',e.inv,'"'+(e.note||'').replace(/"/g,"'")+'"']);
   const csv=[heads,...rows].map(r=>r.join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='work-tracker-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
   showToast('CSV downloaded');document.getElementById('export-menu').classList.remove('open');
 }
 
-// ── Mileage report ────────────────────────────────────────
 function showMileageReport(){
   document.getElementById('export-menu').classList.remove('open');
-  const travelEntries=entries.filter(e=>(e.km||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
-  const totKm=travelEntries.reduce((s,e)=>s+(e.km||0),0);
-  const totMin=travelEntries.reduce((s,e)=>s+(e.tmin||0),0);
-  const totEarn=travelEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const te=entries.filter(e=>(e.km||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
+  const totKm=te.reduce((s,e)=>s+(e.km||0),0);
+  const totH=te.reduce((s,e)=>s+(e.tmin||0),0);
+  const totEarn=te.reduce((s,e)=>s+(e.trav_earn||0),0);
   document.getElementById('modal-title').textContent='Mileage Report';
-  document.getElementById('modal-body').innerHTML=`
-    <p style="font-size:12px;color:var(--subtle);margin-bottom:12px;">All entries with travel — suitable for tax deduction purposes.</p>
-    ${travelEntries.length===0?'<p style="color:var(--subtle);text-align:center;padding:2rem;">No travel entries found.</p>':`
+  document.getElementById('modal-body').innerHTML=!te.length?'<p style="color:var(--subtle);text-align:center;padding:2rem;">No travel entries found.</p>':`
+    <p style="font-size:12px;color:var(--subtle);margin-bottom:12px;">All displacement entries — use for tax deduction purposes.</p>
     <table class="report-table">
-      <thead><tr><th>Date</th><th>Destination</th><th>KM</th><th>Time</th><th>Rate</th><th>Amount</th></tr></thead>
-      <tbody>${travelEntries.map(e=>`<tr>
-        <td>${e.date}</td><td>${e.dest||'—'}</td>
-        <td>${parseFloat(e.km).toFixed(1)} km</td>
-        <td>${fmtMin(e.tmin)}</td>
-        <td>${e.krate?fmt(e.krate)+'/km':'—'}</td>
-        <td>${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td>
-      </tr>`).join('')}</tbody>
+      <thead><tr><th>Date</th><th>Destination</th><th>KM</th><th>Travel time</th><th>Rate</th><th>KM Reimb.</th></tr></thead>
+      <tbody>${te.map(e=>`<tr><td>${e.date}</td><td>${e.dest||'—'}</td><td>${parseFloat(e.km).toFixed(1)} km</td><td>${fmt_h(e.tmin||0)}</td><td>${e.krate?fmt(e.krate)+'/km':'—'}</td><td>${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td></tr>`).join('')}</tbody>
     </table>
-    <div class="report-total"><span>Total: ${totKm.toFixed(1)} km &nbsp;|&nbsp; ${fmtMin(totMin)} travel time</span><span>${totEarn>0?fmt(totEarn)+' reimbursable':''}</span></div>`}`;
+    <div class="report-total"><span>Total: ${totKm.toFixed(1)} km &nbsp;·&nbsp; ${fmt_h(totH)}</span><span>${totEarn>0?fmt(totEarn)+' reimbursable':''}</span></div>`;
   document.getElementById('modal-overlay').classList.add('open');
 }
 
-// ── Pay period report ─────────────────────────────────────
 function showPayPeriodReport(){
   document.getElementById('export-menu').classList.remove('open');
-  // Group by bi-weekly Sunday periods
   const groups={};
   entries.forEach(e=>{
-    const d=new Date(e.date+'T12:00:00');
-    const day=d.getDay();
+    const d=new Date(e.date+'T12:00:00');const day=d.getDay();
     const sun=new Date(d);sun.setDate(d.getDate()-day);
     const weekNum=Math.floor((sun-new Date('2024-01-07'))/(7*86400000));
     const period=Math.floor(weekNum/2);
     const pSun=new Date(sun);if(weekNum%2!==0)pSun.setDate(pSun.getDate()-7);
     const pSat=new Date(pSun);pSat.setDate(pSun.getDate()+13);
     const key=pSun.toISOString().split('T')[0];
-    if(!groups[key])groups[key]={start:pSun.toISOString().split('T')[0],end:pSat.toISOString().split('T')[0],entries:[],hours:0,ot:0,earned:0};
+    if(!groups[key])groups[key]={start:pSun.toISOString().split('T')[0],end:pSat.toISOString().split('T')[0],entries:[],hours:0,ot:0,earned:0,banked:0};
     groups[key].entries.push(e);
-    groups[key].hours+=(e.hours||0);groups[key].ot+=(e.ot||0);groups[key].earned+=(e.earned||0);
+    groups[key].hours+=(e.hours||0)+(e.tmin||0);
+    groups[key].ot+=(e.ot||0);
+    groups[key].earned+=(e.earned||0);
+    groups[key].banked+=(e.banked_hours||0);
   });
   const sorted=Object.values(groups).sort((a,b)=>b.start.localeCompare(a.start));
   document.getElementById('modal-title').textContent='Pay Period Summary (Bi-weekly)';
-  document.getElementById('modal-body').innerHTML=sorted.length===0?'<p style="color:var(--subtle);text-align:center;padding:2rem;">No entries found.</p>':sorted.map(g=>`
+  document.getElementById('modal-body').innerHTML=!sorted.length?'<p style="color:var(--subtle);text-align:center;padding:2rem;">No entries.</p>':sorted.map(g=>`
     <div class="period-group">
       <div class="period-group-header">${g.start} – ${g.end}</div>
       <table class="report-table">
-        <thead><tr><th>Date</th><th>Hours</th><th>OT</th><th>Tag</th><th>Total</th></tr></thead>
-        <tbody>${g.entries.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<tr><td>${e.date}</td><td>${fmtH(e.hours||0)}</td><td>${(e.ot||0)>0?fmtH(e.ot):'—'}</td><td>${e.tag||'—'}</td><td>${fmt(e.earned)}</td></tr>`).join('')}</tbody>
+        <thead><tr><th>Date</th><th>Hours</th><th>OT</th><th>Banked</th><th>Tag</th><th>Total paid</th></tr></thead>
+        <tbody>${g.entries.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<tr${e.banked?' style="color:var(--bank);"':''}><td>${e.date}</td><td>${fmt_h(e.hours||0)}</td><td>${(e.ot||0)>0?fmt_h(e.ot):'—'}</td><td>${e.banked?'🏦 '+fmt_h(e.banked_hours||0):'—'}</td><td>${e.tag||'—'}</td><td>${fmt(e.earned)}</td></tr>`).join('')}</tbody>
       </table>
-      <div class="report-total"><span>${fmtH(g.hours+g.ot)} total (${fmtH(g.ot)} OT)</span><span>${fmt(g.earned)}</span></div>
+      <div class="report-total">
+        <span>${fmt_h(g.hours)} total${g.ot>0?' ('+fmt_h(g.ot)+' OT)':''}${g.banked>0?' · 🏦 '+fmt_h(g.banked)+' banked':''}</span>
+        <span>${fmt(g.earned)}</span>
+      </div>
     </div>`).join('');
   document.getElementById('modal-overlay').classList.add('open');
 }
 
-// ── Invoice generator ─────────────────────────────────────
+function showBankReport(){
+  document.getElementById('export-menu').classList.remove('open');
+  const bankedEntries=entries.filter(e=>e.banked&&(e.banked_hours||0)>0).sort((a,b)=>a.date.localeCompare(b.date));
+  const withdrawals=getWithdrawals().sort((a,b)=>a.date.localeCompare(b.date));
+  const totalIn=bankedEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const totalOut=withdrawals.reduce((s,w)=>s+w.hours,0);
+  const balance=Math.max(0,totalIn-totalOut);
+  document.getElementById('modal-title').textContent='Hour Bank History';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="report-total" style="margin-bottom:12px;"><span>Total banked</span><span style="color:var(--bank);">${fmt_h(totalIn)}</span></div>
+    <div class="report-total" style="margin-bottom:12px;"><span>Total withdrawn</span><span>${fmt_h(totalOut)}</span></div>
+    <div class="report-total" style="margin-bottom:16px;font-size:15px;"><span>Current balance</span><span style="color:var(--bank);">${fmt_h(balance)}</span></div>
+    <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-bottom:8px;">Banked entries</p>
+    <table class="report-table">
+      <thead><tr><th>Date</th><th>Hours banked</th><th>Tag</th><th>Notes</th></tr></thead>
+      <tbody>${bankedEntries.map(e=>`<tr><td>${e.date}</td><td style="color:var(--bank);font-weight:600;">${fmt_h(e.banked_hours||0)}</td><td>${e.tag||'—'}</td><td>${e.note||'—'}</td></tr>`).join('')}</tbody>
+    </table>
+    ${withdrawals.length?`<p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin:16px 0 8px;">Withdrawals</p>
+    <table class="report-table">
+      <thead><tr><th>Date</th><th>Hours</th><th>Payout</th><th>Note</th></tr></thead>
+      <tbody>${withdrawals.map(w=>`<tr><td>${w.date}</td><td>${fmt_h(w.hours)}</td><td style="color:var(--green-m);">${w.payout>0?fmt(w.payout):'—'}</td><td>${w.note||'—'}</td></tr>`).join('')}</tbody>
+    </table>`:''}`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
 function showInvoice(){
   document.getElementById('export-menu').classList.remove('open');
   const src=selectedIds.size>0?entries.filter(e=>selectedIds.has(e.id)):getFiltered();
   if(!src.length){showToast('No entries to invoice');return;}
   const total=src.reduce((s,e)=>s+(e.earned||0),0);
+  const kmTotal=src.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const hrlyTotal=src.reduce((s,e)=>s+(e.hrly_pay||0),0);
   const invNum='INV-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000);
   const today=new Date().toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'});
   document.getElementById('modal-title').textContent='Invoice';
@@ -739,21 +979,24 @@ function showInvoice(){
         <div class="inv-meta"><strong>Date:</strong> ${today}<br><strong>Due:</strong> Net 30</div>
       </div>
       <table class="inv-table">
-        <thead><tr><th>Date</th><th>Description</th><th>Hours</th><th>Rate</th><th>Expenses</th><th>Amount</th></tr></thead>
-        <tbody>${src.sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<tr>
+        <thead><tr><th>Date</th><th>Description</th><th>Hours</th><th>Rate</th><th>Hrly pay</th><th>KM reimb.</th><th>Expenses</th><th>Total</th></tr></thead>
+        <tbody>${src.filter(e=>!e.banked).sort((a,b)=>a.date.localeCompare(b.date)).map(e=>`<tr>
           <td>${e.date}</td>
           <td>${e.note||e.loc||e.tag||'Work'}</td>
-          <td>${fmtH((e.hours||0)+(e.ot||0))}</td>
+          <td>${fmt_h((e.hours||0)+(e.ot||0)+(e.tmin||0))}</td>
           <td>${fmt(e.rate)}/h</td>
+          <td>${fmt(e.hrly_pay||0)}</td>
+          <td>${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td>
           <td>${(e.exp||0)>0?fmt(e.exp):'—'}</td>
-          <td>${fmt(e.earned)}</td>
+          <td><strong>${fmt(e.earned)}</strong></td>
         </tr>`).join('')}</tbody>
       </table>
       <div class="inv-totals">
-        <div><span>Subtotal</span><span>${fmt(total)}</span></div>
+        <div><span>Hourly pay</span><span>${fmt(hrlyTotal)}</span></div>
+        ${kmTotal>0?`<div><span>KM reimbursement</span><span>${fmt(kmTotal)}</span></div>`:''}
         <div class="inv-grand"><span>Total Due</span><span>${fmt(total)}</span></div>
       </div>
-      <div class="inv-footer">Thank you for your business. Please remit payment within 30 days.</div>
+      <div class="inv-footer">Thank you. Please remit payment within 30 days.</div>
     </div>`;
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -761,7 +1004,7 @@ function showInvoice(){
 function closeModal(ev){if(ev.target===document.getElementById('modal-overlay'))closeModalDirect();}
 function closeModalDirect(){document.getElementById('modal-overlay').classList.remove('open');}
 
-// ── Export / period dropdown ──────────────────────────────
+// ── Period ────────────────────────────────────────────────
 function toggleExportMenu(){document.getElementById('export-menu').classList.toggle('open');}
 function togglePeriodMenu(){document.getElementById('period-menu').classList.toggle('open');}
 document.addEventListener('click',e=>{
@@ -812,65 +1055,83 @@ function getPeriodRange(period,offset){
 
 // ── Formatting ────────────────────────────────────────────
 function fmt(n){return'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-function fmtH(n){return n===0?'0h':(n%1===0?n+'h':parseFloat(n).toFixed(2)+'h');}
-function fmtMin(n){if(!n||n===0)return'—';if(n<60)return n+'min';const h=Math.floor(n/60),m=n%60;return h+'h'+(m>0?' '+m+'min':'');}
-
-// ── Last saved ────────────────────────────────────────────
-function updateLastSaved(){
-  const now=new Date();
-  document.getElementById('last-saved').innerHTML=`<i class="ti ti-circle-check"></i> Saved ${now.toLocaleDateString('en-CA',{month:'short',day:'numeric'})} at ${now.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}`;
-}
+function fmt_h(n){n=parseFloat(n)||0;return n===0?'0h':(n%1===0?n+'h':n.toFixed(2)+'h');}
+function fmtMin(n){if(!n||n===0)return'—';if(n<1)return Math.round(n*60)+'min';const h=Math.floor(n),m=Math.round((n-h)*60);return h+'h'+(m>0?' '+m+'min':'');}
+function updateLastSaved(){const now=new Date();document.getElementById('last-saved').innerHTML=`<i class="ti ti-circle-check"></i> Saved ${now.toLocaleDateString('en-CA',{month:'short',day:'numeric'})} at ${now.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'})}`;}
 
 // ── Render ────────────────────────────────────────────────
 function render(){
   const{start,end,label}=getPeriodRange(currentPeriod,periodOffset);
   document.getElementById('period-label').textContent=label;
   const f=getFiltered();
-  const totH=f.reduce((s,e)=>s+(e.hours||0),0);
+
+  // Metrics
+  const totH=f.reduce((s,e)=>s+(e.hours||0)+(e.tmin||0),0);
   const totOT=f.reduce((s,e)=>s+(e.ot||0),0);
-  const totExp=f.reduce((s,e)=>s+(e.exp||0),0);
-  const totEarn=f.reduce((s,e)=>s+(e.hours||0)*(e.rate||0)+(e.ot||0)*(e.rate||0)*(e.otm||1),0);
+  const totHrly=f.reduce((s,e)=>s+(e.hrly_pay||0),0);
+  const totKmEarn=f.reduce((s,e)=>s+(e.trav_earn||0),0);
   const totKm=f.reduce((s,e)=>s+(e.km||0),0);
-  const totTmin=f.reduce((s,e)=>s+(e.tmin||0),0);
+  const totExp=f.reduce((s,e)=>s+(e.exp||0),0);
   const totAll=f.reduce((s,e)=>s+(e.earned||0),0);
   const outstanding=f.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
-  document.getElementById('m-hours').textContent=fmtH(totH+totOT);
-  document.getElementById('m-ot').textContent=fmtH(totOT)+' overtime';
-  document.getElementById('m-earn').textContent=fmt(totEarn);
-  document.getElementById('m-exp').textContent=fmt(totExp);
+  const totBankedPeriod=f.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const totalBanked=getTotalBanked();
+
+  document.getElementById('m-hours').textContent=fmt_h(totH+totOT);
+  document.getElementById('m-ot').textContent=fmt_h(totOT)+' overtime';
+  document.getElementById('m-earn').textContent=fmt(totHrly);
+  document.getElementById('m-earn-sub').textContent=totBankedPeriod>0?fmt_h(totBankedPeriod)+' banked':'';
+  document.getElementById('m-km-earn').textContent=fmt(totKmEarn);
   document.getElementById('m-km').textContent=totKm>0?totKm.toFixed(1)+' km':'0 km';
-  document.getElementById('m-ttime').textContent=fmtMin(totTmin)+' travel';
+  document.getElementById('m-exp').textContent=fmt(totExp);
   document.getElementById('m-total').textContent=fmt(totAll);
   document.getElementById('m-outstanding').textContent=fmt(outstanding)+' outstanding';
-  // OT alert (weekly hours)
+  document.getElementById('m-bank').textContent=fmt_h(totalBanked);
+  document.getElementById('m-bank-sub').textContent=totalBanked>0?fmt(totalBanked*(parseFloat(getLast('rate'))||0))+' est. value':'Click to withdraw';
+
+  // OT alert
   const threshold=parseFloat(document.getElementById('ot-threshold').value)||40;
-  const totalWeekH=totH+totOT;
+  const weekH=totH+totOT;
   const otAlert=document.getElementById('ot-alert');
-  if(currentPeriod==='week'&&totalWeekH>threshold){
+  if(currentPeriod==='week'&&weekH>threshold){
     otAlert.classList.add('show');
-    document.getElementById('ot-alert-msg').textContent=`⚠ You've logged ${fmtH(totalWeekH)} this week — ${fmtH(totalWeekH-threshold)} over your ${threshold}h threshold.`;
-  }else{otAlert.classList.remove('show');}
-  // Select-all checkbox
+    document.getElementById('ot-alert-msg').textContent=`⚠ ${fmt_h(weekH)} logged this week — ${fmt_h(weekH-threshold)} over ${threshold}h. Consider banking the excess.`;
+  }else otAlert.classList.remove('show');
+
+  // Bank alert
+  const bankAlert=document.getElementById('bank-alert');
+  if(totalBanked>=8){
+    bankAlert.classList.add('show');
+    document.getElementById('bank-alert-msg').textContent=`🏦 You have ${fmt_h(totalBanked)} banked (≈ ${fmt(totalBanked*(parseFloat(getLast('rate'))||0))}). Click the piggy bank to withdraw.`;
+  }else bankAlert.classList.remove('show');
+
+  // Select-all
   const sa=document.getElementById('select-all');
   if(sa){sa.checked=f.length>0&&f.every(e=>selectedIds.has(e.id));sa.indeterminate=!sa.checked&&f.some(e=>selectedIds.has(e.id));}
+
   // Table
   const tbody=document.getElementById('log-body');
-  if(!f.length){tbody.innerHTML='<tr><td colspan="12"><div class="empty"><i class="ti ti-calendar-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>No entries for this period</div></td></tr>';return;}
+  if(!f.length){tbody.innerHTML='<tr><td colspan="13"><div class="empty"><i class="ti ti-calendar-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>No entries for this period</div></td></tr>';return;}
   tbody.innerHTML=f.map((e,idx)=>{
     const sel=selectedIds.has(e.id);
-    const otTag=(e.ot||0)>0?` <span class="badge b-ot">+${fmtH(e.ot)} OT</span>`:'';
-    const travelCell=(e.km||0)>0?`<span class="badge b-travel">${parseFloat(e.km).toFixed(1)}km</span><br><span class="travel-cell">${fmtMin(e.tmin)}${e.dest?' · '+e.dest:''}</span>`:'<span style="color:#ccc;">—</span>';
-    const tagCell=e.tag?`<span class="badge b-tag" onclick="filterByTag('${e.tag}')">${e.tag}</span>`:'<span style="color:#ccc;">—</span>';
-    return`<tr class="${sel?'selected':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
+    const otTag=(e.ot||0)>0?` <span class="badge b-ot">+${fmt_h(e.ot)} OT</span>`:'';
+    const bankTag=e.banked?` <span class="badge b-bank">🏦</span>`:'';
+    const travelCell=(e.km||0)>0||((e.tmin||0)>0)?
+      `<span class="badge b-travel">${(e.km||0)>0?parseFloat(e.km).toFixed(1)+'km':''}</span>${(e.tmin||0)>0?'<br><span class="travel-cell">'+fmtMin(e.tmin)+(e.dest?' · '+e.dest:'')+'</span>':''}`
+      :'<span style="color:#ccc;">—</span>';
+    const tagCell=e.tag?`<span class="badge b-tag" onclick="filterByTag('${e.tag}')" style="cursor:pointer;">${e.tag}</span>`:'<span style="color:#ccc;">—</span>';
+    const breakdown=e.banked?`<div class="breakdown">🏦 ${fmt_h(e.banked_hours||0)} banked</div>`:(e.tmin>0?`<div class="breakdown">incl. ${fmtMin(e.tmin)} travel</div>`:'');
+    return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" ${sel?'checked':''} onchange="toggleRowCb(${e.id},this.checked)"/></td>
       <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${e.date}</td>
-      <td>${fmtH((e.hours||0)+(e.ot||0))}${otTag}</td>
+      <td>${fmt_h((e.hours||0)+(e.ot||0))}${otTag}${bankTag}${breakdown}</td>
       <td style="font-size:11px;color:var(--muted)">${fmt(e.rate)}/h</td>
+      <td style="font-size:12px;">${fmt(e.hrly_pay||0)}</td>
+      <td style="font-size:12px;">${(e.trav_earn||0)>0?fmt(e.trav_earn):'—'}</td>
       <td style="font-size:12px;">${(e.exp||0)>0?fmt(e.exp):'—'}</td>
       <td><span class="amount">${fmt(e.earned)}</span></td>
       <td style="font-size:11px;color:var(--muted)">${e.loc||'—'}</td>
       <td>${tagCell}</td>
-      <td>${travelCell}</td>
       <td onclick="event.stopPropagation()"><select class="inv-sel" onchange="updateInv(${e.id},this.value)">
         <option value="unpaid"${e.inv==='unpaid'?' selected':''}>Unpaid</option>
         <option value="sent"${e.inv==='sent'?' selected':''}>Sent</option>
@@ -878,42 +1139,23 @@ function render(){
       </select></td>
       <td><span class="note-cell" title="${(e.note||'').replace(/"/g,'&quot;')}">${e.note||'—'}</span></td>
       <td onclick="event.stopPropagation()"><div class="actions-cell">
-        <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit this entry">
-          <i class="ti ti-pencil"></i>
-        </button>
-        <button class="act-btn dup" onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">
-          <i class="ti ti-copy"></i>
-        </button>
-        <button class="act-btn del" onclick="event.stopPropagation();deleteEntry(${e.id});" title="Delete this entry">
-          <i class="ti ti-trash"></i>
-        </button>
+        <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit entry">✏️</button>
+        <button class="act-btn dup"  onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">📋</button>
+        <button class="act-btn del"  onclick="event.stopPropagation();deleteEntry(${e.id});" title="Delete entry">🗑️</button>
       </div></td>
     </tr>`;
   }).join('');
 }
 
-function filterByTag(tag){
-  document.getElementById('filter-tag').value=tag;render();
-}
+function filterByTag(tag){document.getElementById('filter-tag').value=tag;render();}
+function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-function showToast(msg){
-  document.getElementById('toast-msg').textContent=msg;
-  const t=document.getElementById('toast');t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+// ── Startup: ensure new DB columns ────────────────────────
+async function ensureColumns(){
+  try{await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay&limit=1');window.hasTagCol=true;}
+  catch(e){window.hasTagCol=false;}
 }
-
-// Add tag column to Supabase if missing (graceful)
-async function ensureTagColumn(){
-  try{
-    await apiFetch('entries?select=tag&limit=1');
-    window.hasTagCol=true;
-  }catch(e){
-    window.hasTagCol=false;
-    console.log('Tag column not found — run SQL: alter table entries add column if not exists tag text;');
-  }
-}
-
-ensureTagColumn().then(()=>loadEntries());
+ensureColumns().then(()=>loadEntries());
 </script>
 </body>
 </html>
