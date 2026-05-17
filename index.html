@@ -292,6 +292,34 @@ body.dark .bulk-count{color:#93C5FD;}
 body.dark .bulk-cancel-btn{color:#93C5FD;border-color:#3B82F6!important;}
 body.dark th{color:#94A3B8;}
 body.dark .select-hint{color:#64748B;}
+
+/* Location dropdown */
+.loc-select-wrap{display:flex;gap:6px;align-items:center;}
+.loc-select{flex:1;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;}
+body.dark .loc-select{background:#0F172A;}
+.loc-select:focus{border-color:var(--blue-m);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.loc-add-btn{white-space:nowrap;font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;background:var(--teal-l);color:var(--teal);border:1px solid var(--teal);cursor:pointer;font-family:inherit;transition:all .15s;}
+.loc-add-btn:hover{background:var(--teal);color:#fff;}
+
+/* Locations manager modal */
+.loc-modal{background:var(--card);border-radius:var(--r2);padding:1.5rem;max-width:720px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.2);}
+.loc-form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px;}
+.loc-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:1rem;}
+.loc-table th{text-align:left;font-size:11px;font-weight:600;color:var(--subtle);padding:8px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.4px;background:var(--bg);}
+.loc-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+.loc-table tr:last-child td{border-bottom:none;}
+.loc-table tr:hover td{background:var(--bg);}
+.loc-edit-btn{background:var(--blue-l);color:var(--blue-m);border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;}
+.loc-del-btn{background:var(--red-l);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;margin-left:4px;}
+.loc-save-btn{background:linear-gradient(135deg,var(--blue-m),var(--green-m));color:#fff;border:none;padding:8px 20px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;}
+.loc-cancel-btn{background:transparent;border:1px solid var(--border);padding:8px 14px;border-radius:var(--r);font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit;}
+.loc-section-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;margin-top:16px;display:flex;align-items:center;gap:8px;}
+.loc-empty{text-align:center;color:var(--subtle);font-size:13px;padding:2rem 0;}
+
+/* Start/end time fields */
+.time-or-divider{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:var(--subtle);font-weight:500;}
+.time-or-divider::before,.time-or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.time-fields-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px;}
 </style>
 </head>
 <body>
@@ -317,6 +345,9 @@ body.dark .select-hint{color:#64748B;}
             <div class="em-item" onclick="showPayPeriodReport()"><i class="ti ti-calendar-stats" style="color:var(--blue-m);"></i> Pay period summary</div>
             <div class="em-item" onclick="showBankReport()"><i class="ti ti-piggy-bank" style="color:var(--bank);"></i> Hour bank history</div>
             <div class="em-item" onclick="showInvoice()"><i class="ti ti-receipt" style="color:var(--teal);"></i> Generate invoice</div>
+            <hr class="em-divider"/>
+            <p class="em-label">Settings</p>
+            <div class="em-item" onclick="openLocModal()">📍 Manage locations</div>
           </div>
         </div>
         <button class="icon-btn" onclick="toggleBankPanel()" title="Hour bank" style="font-size:20px;">🏦</button>
@@ -498,13 +529,35 @@ body.dark .select-hint{color:#64748B;}
     <p class="form-section">Work details</p>
     <div class="form-grid">
       <div class="fg"><label>Date</label><input type="date" id="f-date"/></div>
-      <div class="fg"><label>Regular hours worked</label><input type="number" id="f-hours" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-hours"></span></div>
-      <div class="fg"><label>Overtime hours</label><input type="number" id="f-ot" placeholder="0" min="0" step="0.25" oninput="updateFormCalc()"/><span class="field-hint" id="hint-ot"></span></div>
+      <div class="fg">
+        <label>Regular hours <span style="font-size:10px;color:var(--subtle);font-weight:400;">— or use start/end time →</span></label>
+        <input type="number" id="f-hours" placeholder="e.g. 8.5" min="0" step="0.25" oninput="onHoursInput()"/>
+        <span class="field-hint" id="hint-hours"></span>
+      </div>
+      <div class="fg">
+        <label>Start time <span style="font-size:10px;color:var(--subtle);font-weight:400;">— auto-calculates hours</span></label>
+        <input type="time" id="f-start" oninput="onTimeInput()"/>
+      </div>
+      <div class="fg">
+        <label>End time</label>
+        <input type="time" id="f-end" oninput="onTimeInput()"/>
+        <span id="time-calc-note" style="font-size:11px;color:var(--green-m);font-weight:500;margin-top:3px;min-height:14px;display:block;"></span>
+      </div>
       <div class="fg"><label>Hourly rate ($)</label><input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-rate"></span></div>
-      <div class="fg"><label>OT multiplier</label><select id="f-otm" onchange="updateFormCalc()"><option value="1.5">1.5× time &amp; half</option><option value="2">2× double time</option><option value="1">1× same rate</option></select><span class="field-hint" id="hint-otm"></span></div>
       <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-exp"></span></div>
-      <div class="fg"><label>Location</label><input type="text" id="f-loc" placeholder="Office, remote…"/><span class="field-hint" id="hint-loc"></span></div>
       <div class="fg"><label>Invoice status</label><select id="f-inv"><option value="unpaid">Unpaid</option><option value="sent">Invoice sent</option><option value="paid">Paid</option></select><span class="field-hint" id="hint-inv"></span></div>
+      <div class="fg">
+        <label>Saved location</label>
+        <select id="f-loc-select" class="loc-select" onchange="onLocationSelect()">
+          <option value="">— Select a saved location —</option>
+          <option value="__new__">＋ Add new location…</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Location / address <span style="font-size:10px;color:var(--subtle);font-weight:400;">— or type manually</span></label>
+        <input type="text" id="f-loc" placeholder="Office, remote, address…"/>
+        <span class="field-hint" id="hint-loc"></span>
+      </div>
       <div class="fg" style="position:relative;">
         <label>Projects / Tags</label>
         <div class="tag-wrap-outer">
@@ -559,6 +612,33 @@ body.dark .select-hint{color:#64748B;}
       </tr></thead>
       <tbody id="log-body"></tbody>
     </table>
+  </div>
+</div>
+
+
+<!-- Locations manager modal -->
+<div class="modal-overlay" id="loc-modal-overlay" onclick="closeLocModal(event)">
+  <div class="loc-modal">
+    <div class="modal-header">
+      <h3>📍 Manage saved locations</h3>
+      <button class="modal-close" onclick="closeLocModalDirect()">✕</button>
+    </div>
+    <p class="loc-section-title">➕ Add / edit location</p>
+    <input type="hidden" id="loc-edit-id"/>
+    <div class="loc-form-grid">
+      <div class="fg"><label>Location name *</label><input type="text" id="loc-name" placeholder="e.g. Head Office"/></div>
+      <div class="fg"><label>Address</label><input type="text" id="loc-address" placeholder="123 Main St, Montreal"/></div>
+      <div class="fg"><label>Company code / Tag</label><input type="text" id="loc-code" placeholder="e.g. C14613"/></div>
+      <div class="fg"><label>Distance (km)</label><input type="number" id="loc-km" placeholder="0" min="0" step="0.1"/></div>
+      <div class="fg"><label>Travel time (min)</label><input type="number" id="loc-tmin" placeholder="0" min="0" step="1"/></div>
+      <div class="fg"><label>Travel rate ($/km)</label><input type="number" id="loc-krate" placeholder="0.00" min="0" step="0.01"/></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:1rem;">
+      <button class="loc-save-btn" onclick="saveLocation()">💾 Save location</button>
+      <button class="loc-cancel-btn" onclick="resetLocForm()">Clear</button>
+    </div>
+    <p class="loc-section-title">📋 Saved locations</p>
+    <div id="loc-table-wrap"><div class="loc-empty">No saved locations yet.</div></div>
   </div>
 </div>
 
@@ -737,6 +817,10 @@ function editEntry(id){
   document.getElementById('btn-save').innerHTML='<i class="ti ti-check"></i> Update entry';
   document.getElementById('f-date').value=e.date||'';
   document.getElementById('f-hours').value=e.hours!=null?e.hours:'';
+  // Restore start/end times if saved
+  if(e.start_time){ document.getElementById('f-start').value=e.start_time; document.getElementById('f-hours').disabled=true; document.getElementById('f-hours').style.opacity='0.4'; }
+  if(e.end_time){ document.getElementById('f-end').value=e.end_time; }
+  if(e.start_time&&e.end_time){ const note=document.getElementById('time-calc-note'); if(note) note.textContent='⏱ '+e.start_time+' – '+e.end_time+' = '+parseFloat(e.hours).toFixed(2)+'h'; }
   document.getElementById('f-ot').value=e.ot!=null?e.ot:'';
   document.getElementById('f-rate').value=e.rate!=null?e.rate:'';
   document.getElementById('f-otm').value=e.otm?String(e.otm):'1.5';
@@ -766,7 +850,7 @@ function closeForm(){
   clearForm();editId=null;
 }
 function clearForm(){
-  formTags=[];renderFormTags();
+  formTags=[];renderFormTags();resetTimeFields();const ls=document.getElementById('f-loc-select');if(ls)ls.value='';
   ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-inv').value='unpaid';
   document.getElementById('f-otm').value='1';
@@ -793,6 +877,8 @@ async function saveEntry(){
   const inv=document.getElementById('f-inv').value;
   const note=document.getElementById('f-note').value.trim();
   const tag=getFormTagString();
+  const start_time=document.getElementById('f-start').value||null;
+  const end_time=document.getElementById('f-end').value||null;
   const banking=document.getElementById('f-bank').checked;
   const hasTrav=document.getElementById('f-travel-chk').checked;
   const km=hasTrav?(parseFloat(document.getElementById('f-km').value)||0):0;
@@ -803,7 +889,7 @@ async function saveEntry(){
   const c=calcEntry(hours,ot,rate,otm,exp,km,tmin,krate,banking,hasTrav);
 
   const row={
-    date,hours,ot,rate,otm,exp,loc,inv,note,tag,
+    date,hours,ot,rate,otm,exp,loc,inv,note,tag,start_time,end_time,
     km,tmin,dest,krate,
     banked:banking,
     banked_hours:c.banked_h,
@@ -1575,6 +1661,204 @@ function updateTagFilterUI(){
 
 function updateTagFilter(){ renderTagFilterList(); }
 
+
+// ── Locations system ──────────────────────────────────────
+let locations = [];
+
+async function loadLocations(){
+  try{
+    const d = await apiFetch('locations?select=*&order=name.asc');
+    locations = d || [];
+  } catch(e){ locations = []; }
+  populateLocSelect();
+  renderLocTable();
+}
+
+function populateLocSelect(){
+  const sel = document.getElementById('f-loc-select');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Select a saved location —</option>' +
+    locations.map(l => `<option value="${l.id}">${l.name}${l.address?' — '+l.address:''}</option>`).join('') +
+    '<option value="__new__">＋ Add new location…</option>';
+  if(cur) sel.value = cur;
+}
+
+function onLocationSelect(){
+  const sel = document.getElementById('f-loc-select');
+  const val = sel.value;
+  if(val === '__new__'){
+    sel.value = '';
+    openLocModal();
+    return;
+  }
+  if(!val) return;
+  const loc = locations.find(l => String(l.id) === String(val));
+  if(!loc) return;
+  // Auto-fill displacement fields
+  const travelChk = document.getElementById('f-travel-chk');
+  if(loc.km > 0 || loc.tmin > 0){
+    travelChk.checked = true;
+    toggleTravel(true);
+    document.getElementById('f-km').value = loc.km || '';
+    document.getElementById('f-tmin').value = loc.tmin || '';
+    document.getElementById('f-krate').value = loc.krate || '';
+  }
+  // Auto-fill location text
+  document.getElementById('f-loc').value = loc.address || loc.name;
+  // Auto-fill tag/code
+  if(loc.code){
+    const existing = formTags.filter(t => t !== loc.code);
+    formTags = [loc.code, ...existing];
+    renderFormTags();
+  }
+  updateFormCalc();
+  showToast('📍 '+loc.name+' loaded');
+}
+
+// Locations modal
+function openLocModal(){
+  document.getElementById('export-menu').classList.remove('open');
+  resetLocForm();
+  renderLocTable();
+  document.getElementById('loc-modal-overlay').classList.add('open');
+}
+function closeLocModal(ev){ if(ev.target===document.getElementById('loc-modal-overlay')) closeLocModalDirect(); }
+function closeLocModalDirect(){ document.getElementById('loc-modal-overlay').classList.remove('open'); }
+
+function resetLocForm(){
+  document.getElementById('loc-edit-id').value = '';
+  ['loc-name','loc-address','loc-code','loc-km','loc-tmin','loc-krate'].forEach(id => document.getElementById(id).value = '');
+}
+
+function editLocationForm(id){
+  const loc = locations.find(l => l.id === id);
+  if(!loc) return;
+  document.getElementById('loc-edit-id').value = id;
+  document.getElementById('loc-name').value = loc.name || '';
+  document.getElementById('loc-address').value = loc.address || '';
+  document.getElementById('loc-code').value = loc.code || '';
+  document.getElementById('loc-km').value = loc.km || '';
+  document.getElementById('loc-tmin').value = loc.tmin || '';
+  document.getElementById('loc-krate').value = loc.krate || '';
+  document.getElementById('loc-name').focus();
+  document.getElementById('loc-modal-overlay').scrollTop = 0;
+}
+
+async function saveLocation(){
+  const name = document.getElementById('loc-name').value.trim();
+  if(!name){ alert('Please enter a location name.'); return; }
+  const row = {
+    name,
+    address: document.getElementById('loc-address').value.trim(),
+    code: document.getElementById('loc-code').value.trim(),
+    km: parseFloat(document.getElementById('loc-km').value)||0,
+    tmin: parseFloat(document.getElementById('loc-tmin').value)||0,
+    krate: parseFloat(document.getElementById('loc-krate').value)||0,
+  };
+  const editId = document.getElementById('loc-edit-id').value;
+  try{
+    if(editId){
+      await apiFetch('locations?id=eq.'+editId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
+      showToast('Location updated');
+    } else {
+      await apiFetch('locations', {method:'POST', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
+      showToast('Location saved');
+    }
+    resetLocForm();
+    await loadLocations();
+  } catch(e){ showToast('Error saving location: '+e.message); }
+}
+
+async function deleteLocation(id){
+  if(!confirm('Delete this location?')) return;
+  try{
+    await apiFetch('locations?id=eq.'+id, {method:'DELETE'});
+    showToast('Location deleted');
+    await loadLocations();
+  } catch(e){ showToast('Error deleting'); }
+}
+
+function renderLocTable(){
+  const wrap = document.getElementById('loc-table-wrap');
+  if(!wrap) return;
+  if(!locations.length){
+    wrap.innerHTML = '<div class="loc-empty">No saved locations yet. Add one above!</div>';
+    return;
+  }
+  wrap.innerHTML = `<table class="loc-table">
+    <thead><tr>
+      <th>Name</th><th>Address</th><th>Code/Tag</th><th>KM</th><th>Time</th><th>Rate</th><th></th>
+    </tr></thead>
+    <tbody>${locations.map(l=>`<tr>
+      <td><strong>${l.name}</strong></td>
+      <td style="font-size:12px;color:var(--muted);">${l.address||'—'}</td>
+      <td>${l.code?`<span class="badge b-tag">${l.code}</span>`:'—'}</td>
+      <td>${l.km?l.km+' km':'—'}</td>
+      <td>${l.tmin?l.tmin+' min':'—'}</td>
+      <td>${l.krate?'$'+parseFloat(l.krate).toFixed(2)+'/km':'—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="loc-edit-btn" onclick="editLocationForm(${l.id})">✏️ Edit</button>
+        <button class="loc-del-btn" onclick="deleteLocation(${l.id})">🗑️</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Start/end time system ─────────────────────────────────
+function onHoursInput(){
+  const h = document.getElementById('f-hours').value;
+  const start = document.getElementById('f-start');
+  const end = document.getElementById('f-end');
+  const note = document.getElementById('time-calc-note');
+  if(h && parseFloat(h) > 0){
+    // Grey out time fields
+    start.disabled = true; start.style.opacity = '0.4';
+    end.disabled = true; end.style.opacity = '0.4';
+    if(note) note.textContent = '';
+  } else {
+    start.disabled = false; start.style.opacity = '1';
+    end.disabled = false; end.style.opacity = '1';
+  }
+  updateFormCalc();
+}
+
+function onTimeInput(){
+  const startVal = document.getElementById('f-start').value;
+  const endVal = document.getElementById('f-end').value;
+  const hoursEl = document.getElementById('f-hours');
+  const note = document.getElementById('time-calc-note');
+  if(startVal && endVal){
+    // Calculate hours from times
+    const [sh,sm] = startVal.split(':').map(Number);
+    const [eh,em] = endVal.split(':').map(Number);
+    let totalMin = (eh*60+em) - (sh*60+sm);
+    if(totalMin < 0) totalMin += 24*60; // past midnight
+    const hrs = totalMin/60;
+    hoursEl.value = hrs.toFixed(2);
+    hoursEl.disabled = true;
+    hoursEl.style.opacity = '0.4';
+    if(note) note.textContent = `⏱ ${startVal} – ${endVal} = ${hrs.toFixed(2)}h calculated`;
+  } else if(!startVal && !endVal){
+    hoursEl.disabled = false;
+    hoursEl.style.opacity = '1';
+    if(note) note.textContent = '';
+  }
+  updateFormCalc();
+}
+
+function resetTimeFields(){
+  ['f-start','f-end'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){ el.value=''; el.disabled=false; el.style.opacity='1'; }
+  });
+  const hoursEl = document.getElementById('f-hours');
+  if(hoursEl){ hoursEl.disabled=false; hoursEl.style.opacity='1'; }
+  const note = document.getElementById('time-calc-note');
+  if(note) note.textContent = '';
+}
+
+
 function filterByTag(tag){ selectedTags.clear(); selectedTags.add(tag); updateTagFilterUI(); render(); }
 function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
@@ -1583,7 +1867,7 @@ async function ensureColumns(){
   try{await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay&limit=1');window.hasTagCol=true;}
   catch(e){window.hasTagCol=false;}
 }
-ensureColumns().then(()=>loadEntries());
+ensureColumns().then(()=>{ loadEntries(); loadLocations(); });
 </script>
 </body>
 </html>
