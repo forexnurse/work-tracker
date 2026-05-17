@@ -8,11 +8,11 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;min-height:100vh;}
-.app{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem;}
+.app{max-width:960px;margin:0 auto;padding:1.5rem 1rem 4rem;}
 h1{font-size:22px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:10px;}
 .period-nav{display:flex;align-items:center;gap:4px;flex-wrap:wrap;}
-.pb{font-size:12px;padding:5px 11px;border-radius:8px;border:1px solid #ccc;background:transparent;color:#555;cursor:pointer;transition:all .15s;}
+.pb{font-size:12px;padding:5px 11px;border-radius:8px;border:1px solid #ccc;background:transparent;color:#555;cursor:pointer;transition:all .15s;font-family:inherit;}
 .pb.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a;}
 .pb:not(.active):hover{background:#eee;}
 .nav-arrows{display:flex;align-items:center;gap:4px;margin-left:8px;}
@@ -26,44 +26,50 @@ h1{font-size:22px;font-weight:500;display:flex;align-items:center;gap:8px;}
 .ms{font-size:11px;color:#aaa;margin-top:2px;}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;}
 .section-head h2{font-size:16px;font-weight:500;}
-.add-btn{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px 14px;cursor:pointer;border-radius:8px;background:transparent;border:1px solid #ccc;color:#1a1a1a;transition:background .15s;}
-.add-btn:hover{background:#eee;}
-.form-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;display:none;}
+.add-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;padding:7px 16px;cursor:pointer;border-radius:8px;background:#1a1a1a;border:none;color:#fff;transition:background .15s;font-family:inherit;}
+.add-btn:hover{background:#333;}
+.form-card{background:#fff;border:1px solid #e8e8e4;border-radius:12px;padding:1.25rem;margin-bottom:1rem;display:none;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 .form-card.open{display:block;}
-.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:2px;}
-.fg label{font-size:12px;color:#777;}
-.fg input,.fg select,.fg textarea{font-size:13px;padding:7px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;width:100%;}
+.form-title{font-size:13px;font-weight:600;color:#555;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.fg{display:flex;flex-direction:column;gap:4px;}
+.fg label{font-size:12px;color:#777;font-weight:500;}
+.fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;background:#fafaf8;color:#1a1a1a;width:100%;font-family:inherit;outline:none;transition:border-color .15s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:#1a1a1a;}
 .fg textarea{resize:vertical;min-height:52px;}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px;}
-.travel-section{border-top:1px solid #eee;padding-top:10px;margin-top:6px;}
-.travel-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;cursor:pointer;margin-bottom:8px;user-select:none;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px;}
+.rate-hint{font-size:11px;color:#888;margin-top:2px;}
+.travel-section{border-top:1px solid #eee;padding-top:10px;margin-top:8px;}
+.travel-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:#555;cursor:pointer;margin-bottom:8px;user-select:none;font-weight:500;}
+.travel-toggle input{cursor:pointer;accent-color:#1a1a1a;}
 .travel-fields{display:none;}
 .travel-fields.show{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;}
-.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;}
-.btn-save{background:#1a1a1a;color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:13px;cursor:pointer;}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;}
+.btn-save{background:#1a1a1a;color:#fff;border:none;padding:8px 22px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
 .btn-save:hover{background:#333;}
-.btn-cancel{background:transparent;border:1px solid #ccc;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;color:#555;}
-.table-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e8e8e4;}
+.btn-cancel{background:transparent;border:1px solid #ccc;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;color:#555;font-family:inherit;}
+.table-wrap{background:#fff;border:1px solid #e8e8e4;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06);overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
-th{text-align:left;font-size:11px;font-weight:500;color:#888;padding:10px 8px;border-bottom:1px solid #eee;white-space:nowrap;}
-td{padding:9px 8px;border-bottom:1px solid #f0f0ec;color:#1a1a1a;vertical-align:top;}
+th{text-align:left;font-size:11px;font-weight:500;color:#888;padding:10px 8px;border-bottom:1px solid #eee;white-space:nowrap;background:#fafaf8;text-transform:uppercase;letter-spacing:.3px;}
+td{padding:9px 8px;border-bottom:1px solid #f0f0ec;color:#1a1a1a;vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:#fafaf8;}
-.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:500;}
-.b-unpaid{background:#FAEEDA;color:#633806;}
-.b-sent{background:#E6F1FB;color:#0C447C;}
-.b-paid{background:#EAF3DE;color:#27500A;}
-.b-ot{background:#FBEAF0;color:#72243E;}
-.b-travel{background:#EEEDFE;color:#3C3489;}
-.inv-sel{font-size:11px;background:transparent;border:1px solid #ddd;border-radius:99px;padding:2px 8px;color:#1a1a1a;cursor:pointer;}
-.del-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:13px;padding:2px 4px;border-radius:4px;}
-.del-btn:hover{color:#1a1a1a;background:#f0f0ec;}
-.empty{text-align:center;color:#bbb;font-size:14px;padding:3rem 0;}
+.badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;}
+.b-unpaid{background:#FEF3C7;color:#92400E;}
+.b-sent{background:#DBEAFE;color:#1E40AF;}
+.b-paid{background:#D1FAE5;color:#065F46;}
+.b-ot{background:#FCE7F3;color:#9D174D;}
+.b-travel{background:#EDE9FE;color:#4C1D95;}
+.inv-sel{font-size:11px;background:transparent;border:1px solid #ddd;border-radius:99px;padding:2px 8px;color:#1a1a1a;cursor:pointer;font-family:inherit;}
+.act-btn{background:none;border:none;cursor:pointer;color:#bbb;font-size:13px;padding:3px 4px;border-radius:4px;line-height:1;}
+.act-btn:hover{color:#1a1a1a;background:#f0f0ec;}
+.act-btn.edit:hover{color:#1E40AF;background:#DBEAFE;}
+.act-btn.del:hover{color:#DC2626;background:#FEE2E2;}
+.actions-cell{display:flex;gap:2px;align-items:center;}
+.empty{text-align:center;color:#bbb;font-size:13px;padding:3rem 0;}
 .note-cell{font-size:11px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:110px;}
 .travel-cell{font-size:11px;color:#888;}
-.toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;font-weight:500;}
 .toast.show{opacity:1;}
-.loading{text-align:center;color:#aaa;padding:2rem;font-size:13px;}
 @media(max-width:600px){.app{padding:1rem .75rem 3rem;}.metrics{grid-template-columns:repeat(2,1fr);}.mv{font-size:17px;}.top-bar{flex-direction:column;align-items:flex-start;}}
 </style>
 </head>
@@ -80,9 +86,9 @@ tr:hover td{background:#fafaf8;}
         <button class="pb" onclick="setPeriod('year')">Year</button>
       </div>
       <div class="nav-arrows">
-        <button class="ab" onclick="shiftPeriod(-1)" aria-label="Previous"><i class="ti ti-chevron-left"></i></button>
+        <button class="ab" onclick="shiftPeriod(-1)">&#8249;</button>
         <span id="period-label">—</span>
-        <button class="ab" onclick="shiftPeriod(1)" aria-label="Next"><i class="ti ti-chevron-right"></i></button>
+        <button class="ab" onclick="shiftPeriod(1)">&#8250;</button>
       </div>
     </div>
   </div>
@@ -91,29 +97,46 @@ tr:hover td{background:#fafaf8;}
     <div class="metric"><p class="ml">Total hours</p><p class="mv" id="m-hours">0h</p><p class="ms" id="m-ot">0h overtime</p></div>
     <div class="metric"><p class="ml">Hourly earnings</p><p class="mv" id="m-earn">$0.00</p></div>
     <div class="metric"><p class="ml">Expenses</p><p class="mv" id="m-exp">$0.00</p></div>
-    <div class="metric"><p class="ml">Travel</p><p class="mv" id="m-km">0 km</p><p class="ms" id="m-ttime">—</p></div>
+    <div class="metric"><p class="ml">Travel</p><p class="mv" id="m-km">0 km</p><p class="ms" id="m-ttime">— travel</p></div>
     <div class="metric"><p class="ml">Total</p><p class="mv" id="m-total">$0.00</p><p class="ms" id="m-outstanding">$0.00 outstanding</p></div>
   </div>
 
   <div class="section-head">
     <h2>Time log</h2>
-    <button class="add-btn" onclick="toggleForm()"><i class="ti ti-plus"></i> Add entry</button>
+    <button class="add-btn" onclick="openForm()"><i class="ti ti-plus"></i> Add entry</button>
   </div>
 
   <div class="form-card" id="entry-form">
+    <p class="form-title" id="form-title"><i class="ti ti-plus"></i> New entry</p>
     <div class="form-grid">
       <div class="fg"><label>Date</label><input type="date" id="f-date"/></div>
       <div class="fg"><label>Regular hours</label><input type="number" id="f-hours" placeholder="0" min="0" step="0.25"/></div>
       <div class="fg"><label>Overtime hours</label><input type="number" id="f-ot" placeholder="0" min="0" step="0.25"/></div>
-      <div class="fg"><label>Hourly rate ($)</label><input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01"/></div>
-      <div class="fg"><label>OT multiplier</label><select id="f-otm"><option value="1.5">1.5× time &amp; half</option><option value="2">2× double time</option><option value="1">1× same rate</option></select></div>
+      <div class="fg">
+        <label>Hourly rate ($)</label>
+        <input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01"/>
+        <span class="rate-hint" id="rate-hint"></span>
+      </div>
+      <div class="fg"><label>OT multiplier</label>
+        <select id="f-otm">
+          <option value="1.5">1.5× time &amp; half</option>
+          <option value="2">2× double time</option>
+          <option value="1">1× same rate</option>
+        </select>
+      </div>
       <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01"/></div>
       <div class="fg"><label>Location</label><input type="text" id="f-loc" placeholder="Office, remote…"/></div>
-      <div class="fg"><label>Invoice status</label><select id="f-inv"><option value="unpaid">Unpaid</option><option value="sent">Invoice sent</option><option value="paid">Paid</option></select></div>
+      <div class="fg"><label>Invoice status</label>
+        <select id="f-inv">
+          <option value="unpaid">Unpaid</option>
+          <option value="sent">Invoice sent</option>
+          <option value="paid">Paid</option>
+        </select>
+      </div>
     </div>
-    <div class="fg" style="margin-bottom:10px;"><label>Notes</label><textarea id="f-note" placeholder="Task, project, description…"></textarea></div>
+    <div class="fg" style="margin-bottom:12px;"><label>Notes</label><textarea id="f-note" placeholder="Task, project, description…"></textarea></div>
     <div class="travel-section">
-      <label class="travel-toggle"><input type="checkbox" id="f-travel-chk" onchange="toggleTravel(this.checked)"><i class="ti ti-car" style="font-size:15px;"></i> Displacement from home base</label>
+      <label class="travel-toggle"><input type="checkbox" id="f-travel-chk" onchange="toggleTravel(this.checked)"><i class="ti ti-car"></i> Displacement from home base</label>
       <div class="travel-fields" id="travel-fields">
         <div class="fg"><label>Distance (km)</label><input type="number" id="f-km" placeholder="0" min="0" step="0.1"/></div>
         <div class="fg"><label>Travel time (min)</label><input type="number" id="f-tmin" placeholder="0" min="0" step="1"/></div>
@@ -122,26 +145,26 @@ tr:hover td{background:#fafaf8;}
       </div>
     </div>
     <div class="form-actions">
-      <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
-      <button class="btn-save" onclick="saveEntry()">Save entry</button>
+      <button class="btn-cancel" onclick="closeForm()">Cancel</button>
+      <button class="btn-save" id="btn-save" onclick="saveEntry()">Save entry</button>
     </div>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead><tr>
-        <th style="width:82px;">Date</th>
-        <th style="width:70px;">Hours</th>
-        <th style="width:62px;">Rate</th>
-        <th style="width:64px;">Expenses</th>
-        <th style="width:74px;">Total</th>
-        <th style="width:80px;">Location</th>
-        <th style="width:105px;">Travel</th>
-        <th style="width:78px;">Invoice</th>
+        <th style="width:88px;">Date</th>
+        <th style="width:72px;">Hours</th>
+        <th style="width:64px;">Rate</th>
+        <th style="width:68px;">Expenses</th>
+        <th style="width:80px;">Total</th>
+        <th style="width:82px;">Location</th>
+        <th style="width:108px;">Travel</th>
+        <th style="width:80px;">Invoice</th>
         <th>Notes</th>
-        <th style="width:32px;"></th>
+        <th style="width:60px;"></th>
       </tr></thead>
-      <tbody id="log-body"><tr><td colspan="10"><div class="loading">Loading…</div></td></tr></tbody>
+      <tbody id="log-body"><tr><td colspan="10"><div class="empty">Loading…</div></td></tr></tbody>
     </table>
   </div>
 </div>
@@ -151,25 +174,89 @@ tr:hover td{background:#fafaf8;}
 const SUPA_URL = 'https://nrbysuqucownhfwoxifm.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yYnlzdXF1Y293bmhmd294aWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4OTk4NDUsImV4cCI6MjA5NDQ3NTg0NX0.89sniavjSfb2f_y_bQ3H243z5Q__LysRWmMskW5Na1A';
 const H = {'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+const RATE_KEY = 'wt_last_rate';
+const KRATE_KEY = 'wt_last_krate';
 
-let entries=[], currentPeriod='week', periodOffset=0;
+let entries=[], currentPeriod='week', periodOffset=0, editId=null;
 
-async function apiFetch(path,opts={}){
-  const res=await fetch(SUPA_URL+'/rest/v1/'+path,{...opts,headers:{...H,...(opts.headers||{})}});
-  if(!res.ok){const t=await res.text();throw new Error(t);}
-  if(res.status===204)return null;
-  return res.json();
+async function apiFetch(path, opts={}){
+  const res = await fetch(SUPA_URL+'/rest/v1/'+path, {...opts, headers:{...H,...(opts.headers||{})}});
+  if(res.status===204) return null;
+  const text = await res.text();
+  if(!res.ok) throw new Error(text);
+  return text ? JSON.parse(text) : null;
 }
 
 async function loadEntries(){
-  try{const data=await apiFetch('entries?select=*&order=date.desc');entries=data||[];}
-  catch(e){showToast('Error loading: '+e.message);entries=[];}
+  try{ const data=await apiFetch('entries?select=*&order=date.desc'); entries=data||[]; }
+  catch(e){ showToast('Error loading data'); entries=[]; }
   render();
 }
 
+// ── Form ──────────────────────────────────────────────────
+function openForm(){
+  editId=null;
+  document.getElementById('form-title').innerHTML='<i class="ti ti-plus"></i> New entry';
+  document.getElementById('btn-save').textContent='Save entry';
+  clearForm();
+  // Pre-fill saved rate
+  const savedRate = localStorage.getItem(RATE_KEY);
+  const savedKrate = localStorage.getItem(KRATE_KEY);
+  if(savedRate){ document.getElementById('f-rate').value=savedRate; showRateHint(savedRate); }
+  if(savedKrate){ document.getElementById('f-krate').value=savedKrate; }
+  if(!document.getElementById('f-date').value) document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('entry-form').classList.add('open');
+}
+
+function editEntry(id){
+  const e = entries.find(x=>x.id===id);
+  if(!e) return;
+  editId=id;
+  document.getElementById('form-title').innerHTML='<i class="ti ti-pencil"></i> Edit entry';
+  document.getElementById('btn-save').textContent='Update entry';
+  document.getElementById('f-date').value=e.date||'';
+  document.getElementById('f-hours').value=e.hours||'';
+  document.getElementById('f-ot').value=e.ot||'';
+  document.getElementById('f-rate').value=e.rate||'';
+  document.getElementById('f-otm').value=e.otm||'1.5';
+  document.getElementById('f-exp').value=e.exp||'';
+  document.getElementById('f-loc').value=e.loc||'';
+  document.getElementById('f-inv').value=e.inv||'unpaid';
+  document.getElementById('f-note').value=e.note||'';
+  const hasTrav=e.km>0;
+  document.getElementById('f-travel-chk').checked=hasTrav;
+  toggleTravel(hasTrav);
+  if(hasTrav){
+    document.getElementById('f-km').value=e.km||'';
+    document.getElementById('f-tmin').value=e.tmin||'';
+    document.getElementById('f-dest').value=e.dest||'';
+    document.getElementById('f-krate').value=e.krate||'';
+  }
+  document.getElementById('entry-form').classList.add('open');
+  document.getElementById('entry-form').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeForm(){ document.getElementById('entry-form').classList.remove('open'); clearForm(); editId=null; }
+
+function clearForm(){
+  ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-inv').value='unpaid';
+  document.getElementById('f-otm').value='1.5';
+  document.getElementById('f-travel-chk').checked=false;
+  document.getElementById('rate-hint').textContent='';
+  toggleTravel(false);
+}
+
+function showRateHint(rate){
+  const hint = document.getElementById('rate-hint');
+  hint.textContent = rate ? '↑ Last used: $'+parseFloat(rate).toFixed(2)+'/h' : '';
+}
+
+function toggleTravel(on){ document.getElementById('travel-fields').className='travel-fields'+(on?' show':''); }
+
 async function saveEntry(){
   const date=document.getElementById('f-date').value;
-  if(!date){alert('Please enter a date.');return;}
+  if(!date){ alert('Please enter a date.'); return; }
   const hours=parseFloat(document.getElementById('f-hours').value)||0;
   const ot=parseFloat(document.getElementById('f-ot').value)||0;
   const rate=parseFloat(document.getElementById('f-rate').value)||0;
@@ -186,96 +273,95 @@ async function saveEntry(){
   const trav_earn=km*krate;
   const earned=(hours*rate)+(ot*rate*otm)+exp+trav_earn;
   const row={date,hours,ot,rate,otm,exp,loc,inv,note,km,tmin,dest,krate,trav_earn,earned};
+
+  // Save rate for next time
+  if(rate>0){ localStorage.setItem(RATE_KEY, rate); }
+  if(krate>0){ localStorage.setItem(KRATE_KEY, krate); }
+
   try{
-    await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
-    showToast('Entry saved');toggleForm(false);await loadEntries();
-  }catch(e){showToast('Error saving: '+e.message);}
+    if(editId){
+      await apiFetch('entries?id=eq.'+editId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
+      showToast('Entry updated ✓');
+    } else {
+      await apiFetch('entries', {method:'POST', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
+      showToast('Entry saved ✓');
+    }
+    closeForm();
+    await loadEntries();
+  } catch(e){ showToast('Error: '+e.message); }
 }
 
 async function deleteEntry(id){
-  if(!confirm('Delete this entry?'))return;
-  try{await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast('Deleted');await loadEntries();}
-  catch(e){showToast('Error deleting');}
+  if(!confirm('Delete this entry?')) return;
+  try{ await apiFetch('entries?id=eq.'+id, {method:'DELETE'}); showToast('Entry deleted'); await loadEntries(); }
+  catch(e){ showToast('Error deleting entry'); }
 }
 
 async function updateInv(id,val){
   try{
-    await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({inv:val})});
-    entries=entries.map(e=>e.id===id?{...e,inv:val}:e);render();
-  }catch(e){showToast('Error updating');}
+    await apiFetch('entries?id=eq.'+id, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify({inv:val})});
+    entries=entries.map(e=>e.id===id?{...e,inv:val}:e); render();
+  } catch(e){ showToast('Error updating status'); }
 }
 
-function toggleForm(open){
-  const f=document.getElementById('entry-form');
-  const isOpen=f.classList.contains('open');
-  if(open===false||isOpen){f.classList.remove('open');clearForm();}
-  else{f.classList.add('open');if(!document.getElementById('f-date').value)document.getElementById('f-date').value=new Date().toISOString().split('T')[0];}
-}
-function clearForm(){
-  ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-inv').value='unpaid';
-  document.getElementById('f-otm').value='1.5';
-  document.getElementById('f-travel-chk').checked=false;
-  toggleTravel(false);
-}
-function toggleTravel(on){document.getElementById('travel-fields').className='travel-fields'+(on?' show':'');}
-
+// ── Period ────────────────────────────────────────────────
 function getPeriodRange(period,offset){
-  const now=new Date();let start,end,label;
+  const now=new Date(); let start,end,label;
   if(period==='day'){
-    const d=new Date(now);d.setDate(d.getDate()+offset);
+    const d=new Date(now); d.setDate(d.getDate()+offset);
     start=end=d.toISOString().split('T')[0];
     label=d.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
-  }else if(period==='week'){
-    const d=new Date(now);const day=d.getDay();const mon=new Date(d);
+  } else if(period==='week'){
+    const d=new Date(now); const day=d.getDay(); const mon=new Date(d);
     mon.setDate(d.getDate()-((day+6)%7)+offset*7);
-    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-    start=mon.toISOString().split('T')[0];end=sun.toISOString().split('T')[0];
+    const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+    start=mon.toISOString().split('T')[0]; end=sun.toISOString().split('T')[0];
     label=mon.toLocaleDateString('en-CA',{month:'short',day:'numeric'})+' – '+sun.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
-  }else if(period==='month'){
+  } else if(period==='month'){
     const d=new Date(now.getFullYear(),now.getMonth()+offset,1);
     const e=new Date(d.getFullYear(),d.getMonth()+1,0);
-    start=d.toISOString().split('T')[0];end=e.toISOString().split('T')[0];
+    start=d.toISOString().split('T')[0]; end=e.toISOString().split('T')[0];
     label=d.toLocaleDateString('en-CA',{month:'long',year:'numeric'});
-  }else if(period==='quarter'){
+  } else if(period==='quarter'){
     const base=new Date(now.getFullYear(),now.getMonth(),1);
     const qStart=new Date(base.getFullYear(),Math.floor(base.getMonth()/3)*3+offset*3,1);
     const qEnd=new Date(qStart.getFullYear(),qStart.getMonth()+3,0);
-    start=qStart.toISOString().split('T')[0];end=qEnd.toISOString().split('T')[0];
+    start=qStart.toISOString().split('T')[0]; end=qEnd.toISOString().split('T')[0];
     label='Q'+(Math.floor(qStart.getMonth()/3)+1)+' '+qStart.getFullYear();
-  }else{
+  } else {
     const yr=now.getFullYear()+offset;
-    start=yr+'-01-01';end=yr+'-12-31';label=''+yr;
+    start=yr+'-01-01'; end=yr+'-12-31'; label=''+yr;
   }
   return{start,end,label};
 }
-
 function setPeriod(p){
-  currentPeriod=p;periodOffset=0;
+  currentPeriod=p; periodOffset=0;
   document.querySelectorAll('.pb').forEach(b=>{
     const map={day:'Day',week:'Week',month:'Month',quarter:'Quarter',year:'Year'};
     b.classList.toggle('active',map[p]===b.textContent);
   });
   render();
 }
-function shiftPeriod(dir){periodOffset+=dir;render();}
+function shiftPeriod(dir){ periodOffset+=dir; render(); }
 
-function fmt(n){return'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-function fmtH(n){return n===0?'0h':(n%1===0?n+'h':parseFloat(n).toFixed(2)+'h');}
-function fmtMin(n){if(!n||n===0)return'—';if(n<60)return n+'min';const h=Math.floor(n/60),m=n%60;return h+'h'+(m>0?' '+m+'min':'');}
+// ── Formatting ────────────────────────────────────────────
+function fmt(n){ return'$'+parseFloat(n||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,','); }
+function fmtH(n){ return n===0?'0h':(n%1===0?n+'h':parseFloat(n).toFixed(2)+'h'); }
+function fmtMin(n){ if(!n||n===0)return'—'; if(n<60)return n+'min'; const h=Math.floor(n/60),m=n%60; return h+'h'+(m>0?' '+m+'min':''); }
 
+// ── Render ────────────────────────────────────────────────
 function render(){
   const{start,end,label}=getPeriodRange(currentPeriod,periodOffset);
   document.getElementById('period-label').textContent=label;
-  const filtered=entries.filter(e=>e.date>=start&&e.date<=end);
-  const totH=filtered.reduce((s,e)=>s+(e.hours||0),0);
-  const totOT=filtered.reduce((s,e)=>s+(e.ot||0),0);
-  const totExp=filtered.reduce((s,e)=>s+(e.exp||0),0);
-  const totEarn=filtered.reduce((s,e)=>s+(e.hours||0)*(e.rate||0)+(e.ot||0)*(e.rate||0)*(e.otm||1),0);
-  const totKm=filtered.reduce((s,e)=>s+(e.km||0),0);
-  const totTmin=filtered.reduce((s,e)=>s+(e.tmin||0),0);
-  const totAll=filtered.reduce((s,e)=>s+(e.earned||0),0);
-  const outstanding=filtered.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+  const f=entries.filter(e=>e.date>=start&&e.date<=end);
+  const totH=f.reduce((s,e)=>s+(e.hours||0),0);
+  const totOT=f.reduce((s,e)=>s+(e.ot||0),0);
+  const totExp=f.reduce((s,e)=>s+(e.exp||0),0);
+  const totEarn=f.reduce((s,e)=>s+(e.hours||0)*(e.rate||0)+(e.ot||0)*(e.rate||0)*(e.otm||1),0);
+  const totKm=f.reduce((s,e)=>s+(e.km||0),0);
+  const totTmin=f.reduce((s,e)=>s+(e.tmin||0),0);
+  const totAll=f.reduce((s,e)=>s+(e.earned||0),0);
+  const outstanding=f.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
   document.getElementById('m-hours').textContent=fmtH(totH+totOT);
   document.getElementById('m-ot').textContent=fmtH(totOT)+' overtime';
   document.getElementById('m-earn').textContent=fmt(totEarn);
@@ -285,33 +371,40 @@ function render(){
   document.getElementById('m-total').textContent=fmt(totAll);
   document.getElementById('m-outstanding').textContent=fmt(outstanding)+' outstanding';
   const tbody=document.getElementById('log-body');
-  if(!filtered.length){
-    tbody.innerHTML='<tr><td colspan="10"><div class="empty"><i class="ti ti-calendar-off" style="font-size:26px;display:block;margin-bottom:8px;"></i>No entries for this period</div></td></tr>';
+  if(!f.length){
+    tbody.innerHTML='<tr><td colspan="10"><div class="empty">No entries for this period</div></td></tr>';
     return;
   }
-  tbody.innerHTML=filtered.map(e=>{
+  tbody.innerHTML=f.map(e=>{
     const otTag=e.ot>0?` <span class="badge b-ot">+${fmtH(e.ot)} OT</span>`:'';
     const travelCell=e.km>0
       ?`<span class="badge b-travel">${parseFloat(e.km).toFixed(1)}km</span><br><span class="travel-cell">${fmtMin(e.tmin)}${e.dest?' · '+e.dest:''}</span>`
-      :'<span style="color:#ccc;font-size:11px;">—</span>';
+      :'<span style="color:#ccc;">—</span>';
     return`<tr>
-      <td style="white-space:nowrap;font-size:12px;">${e.date}</td>
+      <td style="white-space:nowrap;font-size:12px;color:#666;">${e.date}</td>
       <td>${fmtH((e.hours||0)+(e.ot||0))}${otTag}</td>
-      <td style="font-size:11px;">${fmt(e.rate)}/h</td>
-      <td style="font-size:11px;">${e.exp>0?fmt(e.exp):'—'}</td>
+      <td style="font-size:11px;color:#888;">${fmt(e.rate)}/h</td>
+      <td style="font-size:12px;">${e.exp>0?fmt(e.exp):'—'}</td>
       <td style="font-weight:500;">${fmt(e.earned)}</td>
       <td style="font-size:11px;color:#888;">${e.loc||'—'}</td>
       <td>${travelCell}</td>
-      <td><select class="inv-sel" onchange="updateInv(${e.id},this.value)"><option value="unpaid"${e.inv==='unpaid'?' selected':''}>Unpaid</option><option value="sent"${e.inv==='sent'?' selected':''}>Sent</option><option value="paid"${e.inv==='paid'?' selected':''}>Paid</option></select></td>
+      <td><select class="inv-sel" onchange="updateInv(${e.id},this.value)">
+        <option value="unpaid"${e.inv==='unpaid'?' selected':''}>Unpaid</option>
+        <option value="sent"${e.inv==='sent'?' selected':''}>Sent</option>
+        <option value="paid"${e.inv==='paid'?' selected':''}>Paid</option>
+      </select></td>
       <td><span class="note-cell" title="${e.note||''}">${e.note||'—'}</span></td>
-      <td><button class="del-btn" onclick="deleteEntry(${e.id})" aria-label="Delete"><i class="ti ti-trash"></i></button></td>
+      <td><div class="actions-cell">
+        <button class="act-btn edit" onclick="editEntry(${e.id})" title="Edit entry"><i class="ti ti-pencil"></i></button>
+        <button class="act-btn del" onclick="deleteEntry(${e.id})" title="Delete entry"><i class="ti ti-trash"></i></button>
+      </div></td>
     </tr>`;
   }).join('');
 }
 
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
 }
 
