@@ -166,9 +166,12 @@ table{width:100%;border-collapse:collapse;font-size:12px;min-width:960px;}
 th{text-align:left;font-size:10px;font-weight:600;color:var(--subtle);padding:10px 10px;border-bottom:1px solid var(--border);white-space:nowrap;background:linear-gradient(180deg,#FAFAF8,#F5F2EE);text-transform:uppercase;letter-spacing:.5px;}
 body.dark th{background:linear-gradient(180deg,#1E293B,#0F172A);}
 td{padding:10px 10px;border-bottom:1px solid #F0EDE8;color:var(--text);vertical-align:middle;}
-body.dark td{border-bottom-color:#1E293B;}
+body.dark td{border-bottom-color:#1E293B;color:var(--text);}
+body.dark .note-cell{color:var(--muted);}
+body.dark .travel-cell{color:var(--muted);}
+body.dark .breakdown{color:var(--muted);}
 tr:last-child td{border-bottom:none;}
-tr.selected td{background:#EFF6FF!important;}
+tr.selected td{background:#E8F0FE!important;}
 body.dark tr.selected td{background:#2563EB!important;color:#fff!important;}
 body.dark tr.selected td .amount{color:#fff!important;}
 body.dark tr.selected td .badge{opacity:.9;}
@@ -372,16 +375,15 @@ tr.banked-row{background:linear-gradient(90deg,rgba(124,58,237,.04),transparent)
   <!-- Pay period widget -->
   <div class="paycheck-widget" id="paycheck-widget">
     <div class="paycheck-header">
-      <h3>💰 Next paycheque estimate</h3>
+      <h3>💰 Paycheque estimate</h3>
       <div class="pc-period">
-        <span style="font-size:12px;color:var(--subtle);">Pay period:</span>
-        <button class="pc-period-btn active" id="pp-current-btn" onclick="setPayView('current')">Current</button>
-        <button class="pc-period-btn" id="pp-next-btn" onclick="setPayView('next')">Next</button>
-        <button class="pc-period-btn" id="pp-last-btn" onclick="setPayView('last')">Last paid</button>
+        <button class="ab" onclick="shiftPayPeriod(-1)" title="Previous pay period" style="font-size:18px;font-weight:700;">‹</button>
+        <span id="pp-period-label" style="font-size:12px;color:var(--muted);min-width:80px;text-align:center;font-weight:500;">Current</span>
+        <button class="ab" onclick="shiftPayPeriod(1)" title="Next pay period" style="font-size:18px;font-weight:700;">›</button>
       </div>
     </div>
     <div class="paycheck-grid">
-      <div class="pc-card"><p class="pc-label">Period</p><p class="pc-value" id="pp-dates" style="font-size:13px;font-weight:500;">—</p><p class="pc-sub" id="pp-payday"></p></div>
+      <div class="pc-card"><p class="pc-label">Pay period</p><p class="pc-value" id="pp-dates" style="font-size:13px;font-weight:500;">—</p><p class="pc-sub" id="pp-payday"></p></div>
       <div class="pc-card"><p class="pc-label">Hours worked</p><p class="pc-value" id="pp-hours">0h</p><p class="pc-sub" id="pp-banked-sub"></p></div>
       <div class="pc-card"><p class="pc-label">Hourly pay</p><p class="pc-value" id="pp-hrly">$0.00</p></div>
       <div class="pc-card"><p class="pc-label">KM reimb.</p><p class="pc-value" id="pp-km">$0.00</p></div>
@@ -704,7 +706,7 @@ function closeForm(){
 function clearForm(){
   ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-inv').value='unpaid';
-  document.getElementById('f-otm').value='1.5';
+  document.getElementById('f-otm').value='1';
   document.getElementById('f-bank').checked=false;
   document.getElementById('f-travel-chk').checked=false;
   Object.keys(LK).forEach(k=>{const el=document.getElementById('hint-'+k);if(el)el.innerHTML='';});
@@ -767,10 +769,53 @@ async function saveEntry(){
 async function duplicateEntry(id){
   if(window.event)window.event.stopPropagation();
   const e=entries.find(x=>x.id===id);if(!e)return;
+  // Show mini date picker modal
+  showDupDatePicker(id);
+}
+
+function showDupDatePicker(id){
+  const today = new Date().toISOString().split('T')[0];
+  // Remove any existing picker
+  const existing = document.getElementById('dup-picker-overlay');
+  if(existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'dup-picker-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:1rem;';
+  overlay.innerHTML = `
+    <div style="background:var(--card);border-radius:14px;padding:1.5rem;max-width:320px;width:100%;box-shadow:0 24px 48px rgba(0,0,0,.2);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <p style="font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;">📋 Duplicate entry</p>
+        <button onclick="document.getElementById('dup-picker-overlay').remove()" style="background:none;border:none;cursor:pointer;color:var(--subtle);font-size:20px;">✕</button>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Select the date for the duplicated entry:</p>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;color:var(--muted);font-weight:500;display:block;margin-bottom:6px;">Date</label>
+        <input type="date" id="dup-date-input" value="${today}" style="font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);width:100%;font-family:inherit;"/>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button onclick="document.getElementById('dup-picker-overlay').remove()" style="background:transparent;border:1px solid var(--border);padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--muted);font-family:inherit;">Cancel</button>
+        <button onclick="confirmDuplicate(${id})" style="background:linear-gradient(135deg,var(--blue-m),var(--green-m));color:#fff;border:none;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">📋 Duplicate</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  // Close on backdrop click
+  overlay.addEventListener('click', function(ev){ if(ev.target===overlay) overlay.remove(); });
+  // Focus the date input
+  setTimeout(()=>document.getElementById('dup-date-input').focus(), 50);
+}
+
+async function confirmDuplicate(id){
+  const date = document.getElementById('dup-date-input').value;
+  if(!date){ alert('Please select a date.'); return; }
+  const e = entries.find(x=>x.id===id); if(!e) return;
   const{id:_,created_at:__,...row}=e;
-  row.date=new Date().toISOString().split('T')[0];
-  try{await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});showToast('Duplicated to today');updateLastSaved();await loadEntries();}
-  catch(e){showToast('Error duplicating');}
+  row.date = date;
+  document.getElementById('dup-picker-overlay').remove();
+  try{
+    await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    showToast('Duplicated to '+date);updateLastSaved();await loadEntries();
+  }catch(e){showToast('Error duplicating');}
 }
 
 async function deleteEntry(id){
@@ -1190,21 +1235,41 @@ function render(){
 
 
 // ── Pay period engine ─────────────────────────────────────
-// Pay periods: bi-weekly starting April 13, 2026 (job start)
-// Last pay: May 16. Next pay: May 30.
-const PAY_START = new Date('2026-04-13T00:00:00');
-let payView = 'current';
+// Bi-weekly pay periods: Sun–Sat, paid the following Friday
+// Job start: April 13, 2026. First full period anchor: Sun April 13.
+// Periods are 2 weeks (14 days) Sun to Sat.
+let payPeriodOffset = 0;  // 0 = current, -1 = previous, +1 = next
+
+function getSundayOfWeek(d){
+  const dt = new Date(d);
+  dt.setHours(0,0,0,0);
+  const day = dt.getDay(); // 0=Sun
+  dt.setDate(dt.getDate() - day);
+  return dt;
+}
 
 function getPayPeriod(offset){
-  // Each period is 14 days from PAY_START
-  const today = new Date();
+  // Anchor: first Sunday on or after April 13 2026
+  const anchor = new Date('2026-04-13T00:00:00');
+  const anchorDay = anchor.getDay();
+  // April 13 is a Monday (day 1), so first Sunday is April 12 — go back to find it
+  const firstSun = new Date(anchor);
+  firstSun.setDate(anchor.getDate() - anchorDay); // Sunday of that week
+
+  // Find current period number from firstSun
+  const today = new Date(); today.setHours(0,0,0,0);
   const msPerPeriod = 14 * 86400000;
-  const elapsed = today - PAY_START;
+  const elapsed = today - firstSun;
   const currentPeriodNum = Math.floor(elapsed / msPerPeriod);
   const targetNum = currentPeriodNum + offset;
-  const pStart = new Date(PAY_START.getTime() + targetNum * msPerPeriod);
-  const pEnd = new Date(pStart.getTime() + msPerPeriod - 86400000);
-  const payDay = new Date(pEnd.getTime() + 86400000); // paid day after period ends
+
+  // Period runs Sun to Sat (13 days later)
+  const pStart = new Date(firstSun.getTime() + targetNum * msPerPeriod);
+  const pEnd = new Date(pStart.getTime() + 13 * 86400000); // Saturday
+  // Payday: Friday of the week after period ends
+  const payDay = new Date(pEnd.getTime() + 86400000); // Sunday after period
+  payDay.setDate(payDay.getDate() + 5); // Friday
+
   return { start: pStart, end: pEnd, payDay, num: targetNum };
 }
 
@@ -1212,63 +1277,75 @@ function toDateStr(d){
   return d.toISOString().split('T')[0];
 }
 
-function setPayView(v){
-  payView = v;
-  document.getElementById('pp-current-btn').classList.toggle('active', v==='current');
-  document.getElementById('pp-next-btn').classList.toggle('active', v==='next');
-  document.getElementById('pp-last-btn').classList.toggle('active', v==='last');
+function shiftPayPeriod(dir){
+  payPeriodOffset += dir;
+  // Prevent going into future beyond next period
+  if(payPeriodOffset > 1) payPeriodOffset = 1;
   renderPayWidget();
 }
 
 function renderPayWidget(){
-  const offset = payView==='current' ? 0 : payView==='next' ? 1 : -1;
-  const pp = getPayPeriod(offset);
+  const pp = getPayPeriod(payPeriodOffset);
   const start = toDateStr(pp.start);
   const end = toDateStr(pp.end);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayStr = toDateStr(today);
+  const isCurrent = payPeriodOffset === 0;
+  const isPast = payPeriodOffset < 0;
+  const isNext = payPeriodOffset > 0;
 
-  // Filter entries in this period
-  const periodEntries = entries.filter(e => e.date >= start && e.date <= end && !e.banked);
-  const totH = periodEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
-  const totOT = periodEntries.reduce((s,e)=>s+(e.ot||0),0);
-  const totHrly = periodEntries.reduce((s,e)=>s+(e.hrly_pay||0),0);
-  const totKm = periodEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
-  const totExp = periodEntries.reduce((s,e)=>s+(e.exp||0),0);
-  const totBanked = periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
-  const total = periodEntries.reduce((s,e)=>s+(e.earned||0),0);
-  const outstanding = periodEntries.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+  // Period label
+  let periodLabel = '';
+  if(isCurrent) periodLabel = 'Current';
+  else if(isNext) periodLabel = 'Next';
+  else if(payPeriodOffset === -1) periodLabel = 'Previous';
+  else periodLabel = payPeriodOffset + ' periods ago';
+  document.getElementById('pp-period-label').textContent = periodLabel;
 
-  // Progress through period
-  const today = new Date();
+  // Filter entries — include banked entries for hours but not for pay
+  const periodEntries = entries.filter(e => e.date >= start && e.date <= end);
+  const paidEntries = periodEntries.filter(e => !e.banked);
+  const totH = paidEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
+  const totOT = paidEntries.reduce((s,e)=>s+(e.ot||0),0);
+  const totBankedH = periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const totHrly = paidEntries.reduce((s,e)=>s+(e.hrly_pay||0),0);
+  const totKm = paidEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const totExp = paidEntries.reduce((s,e)=>s+(e.exp||0),0);
+  const total = paidEntries.reduce((s,e)=>s+(e.earned||0),0);
+  const outstanding = paidEntries.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+
+  // Progress
   const msPerPeriod = 14 * 86400000;
-  const elapsed = Math.max(0, today - pp.start);
-  const progress = Math.min(100, (elapsed / msPerPeriod) * 100);
-  const daysElapsed = Math.min(14, Math.floor(elapsed / 86400000));
-  const daysLeft = Math.max(0, 14 - daysElapsed);
+  const elapsedMs = Math.max(0, today - pp.start);
+  const progress = isCurrent ? Math.min(100, (elapsedMs / msPerPeriod) * 100) : isPast ? 100 : 0;
+  const daysElapsed = isCurrent ? Math.min(14, Math.floor(elapsedMs / 86400000)) : 0;
+  const daysLeft = isCurrent ? Math.max(0, 14 - daysElapsed) : 0;
 
-  // Payday info
-  const payDayStr = pp.payDay.toLocaleDateString('en-CA', {month:'short', day:'numeric', year:'numeric'});
+  // Payday
+  const payDayStr = pp.payDay.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
   const daysUntilPay = Math.ceil((pp.payDay - today) / 86400000);
   let payDayMsg = '';
-  if(payView==='last') payDayMsg = 'Paid ' + payDayStr;
+  if(isPast) payDayMsg = '✓ Paid ' + pp.payDay.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
   else if(daysUntilPay <= 0) payDayMsg = '🎉 Payday is today!';
   else if(daysUntilPay === 1) payDayMsg = '🎉 Payday tomorrow!';
-  else payDayMsg = `Payday in ${daysUntilPay} days (${payDayStr})`;
+  else payDayMsg = `Payday ${payDayStr} (in ${daysUntilPay} days)`;
 
-  // Update DOM
-  document.getElementById('pp-dates').textContent =
-    pp.start.toLocaleDateString('en-CA',{month:'short',day:'numeric'}) + ' – ' +
+  // Dates display
+  const datesStr = pp.start.toLocaleDateString('en-CA',{month:'short',day:'numeric'}) + ' – ' +
     pp.end.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+
+  document.getElementById('pp-dates').textContent = datesStr;
   document.getElementById('pp-payday').textContent = payDayMsg;
   document.getElementById('pp-hours').textContent = fmt_h(totH + totOT);
-  document.getElementById('pp-banked-sub').textContent = totBanked > 0 ? fmt_h(totBanked) + ' banked' : '';
+  document.getElementById('pp-banked-sub').textContent = totBankedH > 0 ? '🏦 '+fmt_h(totBankedH)+' banked' : '';
   document.getElementById('pp-hrly').textContent = fmt(totHrly);
   document.getElementById('pp-km').textContent = fmt(totKm);
   document.getElementById('pp-exp').textContent = fmt(totExp);
   document.getElementById('pp-total').textContent = fmt(total);
-  document.getElementById('pp-outstanding').textContent = outstanding > 0 ? fmt(outstanding) + ' unpaid' : '✓ All paid';
-  document.getElementById('pp-progress').style.width = progress.toFixed(1) + '%';
-  document.getElementById('pp-days-elapsed').textContent = payView==='current' ? daysElapsed + ' days in' : '';
-  document.getElementById('pp-days-left').textContent = payView==='current' ? daysLeft + ' days left' : '';
+  document.getElementById('pp-outstanding').textContent = outstanding > 0 ? fmt(outstanding)+' unpaid' : (total > 0 ? '✓ All paid' : '');
+  document.getElementById('pp-progress').style.width = progress.toFixed(1)+'%';
+  document.getElementById('pp-days-elapsed').textContent = isCurrent ? daysElapsed+' of 14 days' : '';
+  document.getElementById('pp-days-left').textContent = isCurrent ? daysLeft+' days left' : '';
 }
 
 function filterByTag(tag){document.getElementById('filter-tag').value=tag;render();}
