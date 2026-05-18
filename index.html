@@ -562,7 +562,7 @@ body.dark .loc-select{background:#0F172A;}
       <div class="fg" style="position:relative;">
         <label>Projects / Tags</label>
         <div class="tag-wrap-outer">
-          <div class="tag-input-wrap" id="tag-input-wrap" onclick="document.getElementById('tag-text').focus()">
+          <div class="tag-input-wrap" id="tag-input-wrap" onclick="focusTagInput()">
             <div id="tag-pills"></div>
             <input type="text" id="tag-text" class="tag-text-input" placeholder="Type to add tags…" autocomplete="off"
               oninput="onTagInput()" onkeydown="onTagKeydown(event)" onfocus="showTagAC()" onblur="setTimeout(hideTagAC,150)"/>
@@ -1553,6 +1553,7 @@ function addFormTag(tag){
   hideTagAC();
 }
 
+function focusTagInput(){ const el=document.getElementById("tag-text"); if(el) el.focus(); }
 function onTagInput(){
   acHighlight = -1;
   showTagAC();
