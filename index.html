@@ -294,8 +294,9 @@ body.dark th{color:#94A3B8;}
 body.dark .select-hint{color:#64748B;}
 
 /* Location dropdown */
-.loc-select-wrap{display:flex;gap:6px;align-items:center;}
-.loc-select{flex:1;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;}
+.loc-select-wrap{display:block;}
+.loc-select{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;height:38px;}
+body.dark .loc-select{background:#0F172A;}
 body.dark .loc-select{background:#0F172A;}
 .loc-select:focus{border-color:var(--blue-m);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
 .loc-add-btn{white-space:nowrap;font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;background:var(--teal-l);color:var(--teal);border:1px solid var(--teal);cursor:pointer;font-family:inherit;transition:all .15s;}
@@ -320,6 +321,13 @@ body.dark .loc-select{background:#0F172A;}
 .time-or-divider{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12px;color:var(--subtle);font-weight:500;}
 .time-or-divider::before,.time-or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 .time-fields-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:4px;}
+
+/* Note tooltip */
+.note-tooltip-wrap{position:relative;display:inline-block;max-width:80px;}
+.note-cell{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:80px;cursor:default;}
+.note-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1C1917;color:#fff;font-size:12px;padding:8px 12px;border-radius:8px;white-space:pre-wrap;max-width:260px;min-width:120px;z-index:400;box-shadow:0 4px 16px rgba(0,0,0,.2);line-height:1.5;word-break:break-word;}
+.note-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1C1917;}
+.note-tooltip-wrap:hover .note-tooltip{display:block;}
 </style>
 </head>
 <body>
@@ -608,7 +616,7 @@ body.dark .loc-select{background:#0F172A;}
         <th style="width:78px;">Location</th>
         <th style="width:70px;">Tag</th>
         <th style="width:80px;">Invoice</th>
-        <th>Notes</th>
+        <th style="width:80px;">Notes</th>
         <th style="width:100px;min-width:100px;">Actions</th>
       </tr></thead>
       <tbody id="log-body"></tbody>
@@ -1191,7 +1199,7 @@ function showBankReport(){
     <div class="report-total" style="margin-bottom:16px;font-size:15px;"><span>Current balance</span><span style="color:var(--bank);">${fmt_h(balance)}</span></div>
     <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-bottom:8px;">Banked entries</p>
     <table class="report-table">
-      <thead><tr><th>Date</th><th>Hours banked</th><th>Tag</th><th>Notes</th></tr></thead>
+      <thead><tr><th>Date</th><th>Hours banked</th><th>Tag</th><th style="width:80px;">Notes</th></tr></thead>
       <tbody>${bankedEntries.map(e=>`<tr><td>${e.date}</td><td style="color:var(--bank);font-weight:600;">${fmt_h(e.banked_hours||0)}</td><td>${e.tag||'—'}</td><td>${e.note||'—'}</td></tr>`).join('')}</tbody>
     </table>
     ${withdrawals.length?`<p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin:16px 0 8px;">Withdrawals</p>
@@ -1378,7 +1386,7 @@ function render(){
         <option value="sent"${e.inv==='sent'?' selected':''}>Sent</option>
         <option value="paid"${e.inv==='paid'?' selected':''}>Paid</option>
       </select></td>
-      <td><span class="note-cell" title="${(e.note||'').replace(/"/g,'&quot;')}">${e.note||'—'}</span></td>
+      <td><div class="note-tooltip-wrap"><span class="note-cell">${e.note?e.note.substring(0,18)+(e.note.length>18?'…':''):'—'}</span>${e.note&&e.note.length>0?`<div class="note-tooltip">${(e.note).replace(/</g,'&lt;')}</div>`:''}</div></td>
       <td onclick="event.stopPropagation()"><div class="actions-cell">
         <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit entry">✏️</button>
         <button class="act-btn dup"  onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">📋</button>
