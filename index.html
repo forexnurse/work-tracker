@@ -544,6 +544,7 @@ body.dark .loc-select{background:#0F172A;}
         <span id="time-calc-note" style="font-size:11px;color:var(--green-m);font-weight:500;margin-top:3px;min-height:14px;display:block;"></span>
       </div>
       <div class="fg"><label>Hourly rate ($)</label><input type="number" id="f-rate" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-rate"></span></div>
+      <div class="fg"><label>OT multiplier</label><select id="f-otm" onchange="updateFormCalc()"><option value="1" selected>1× same rate</option><option value="1.5">1.5× time &amp; half</option><option value="2">2× double time</option></select><span class="field-hint" id="hint-otm"></span></div>
       <div class="fg"><label>Expenses ($)</label><input type="number" id="f-exp" placeholder="0.00" min="0" step="0.01" oninput="updateFormCalc()"/><span class="field-hint" id="hint-exp"></span></div>
       <div class="fg"><label>Invoice status</label><select id="f-inv"><option value="unpaid">Unpaid</option><option value="sent">Invoice sent</option><option value="paid">Paid</option></select><span class="field-hint" id="hint-inv"></span></div>
       <div class="fg">
@@ -722,7 +723,7 @@ function updateFormCalc(){
   const hasTrav = document.getElementById('f-travel-chk').checked;
   const c = calcEntry(
     document.getElementById('f-hours').value,
-    document.getElementById('f-ot').value,
+    0,
     document.getElementById('f-rate').value,
     document.getElementById('f-otm').value,
     document.getElementById('f-exp').value,
@@ -770,7 +771,7 @@ function fillHints(){
   });
 }
 function prefill(){
-  ['hours','ot','rate','otm','exp','loc','inv','tag'].forEach(k=>{
+  ['hours','rate','otm','exp','loc','inv','tag'].forEach(k=>{
     const v=getLast(k);const el=document.getElementById('f-'+k);
     if(el&&v&&el.value==='')el.value=v;
   });
@@ -821,7 +822,7 @@ function editEntry(id){
   if(e.start_time){ document.getElementById('f-start').value=e.start_time; document.getElementById('f-hours').disabled=true; document.getElementById('f-hours').style.opacity='0.4'; }
   if(e.end_time){ document.getElementById('f-end').value=e.end_time; }
   if(e.start_time&&e.end_time){ const note=document.getElementById('time-calc-note'); if(note) note.textContent='⏱ '+e.start_time+' – '+e.end_time+' = '+parseFloat(e.hours).toFixed(2)+'h'; }
-  document.getElementById('f-ot').value=e.ot!=null?e.ot:'';
+  // ot is auto-calculated from weekly total, not entered manually
   document.getElementById('f-rate').value=e.rate!=null?e.rate:'';
   document.getElementById('f-otm').value=e.otm?String(e.otm):'1.5';
   document.getElementById('f-exp').value=e.exp!=null?e.exp:'';
@@ -851,7 +852,7 @@ function closeForm(){
 }
 function clearForm(){
   formTags=[];renderFormTags();resetTimeFields();const ls=document.getElementById('f-loc-select');if(ls)ls.value='';
-  ['f-date','f-hours','f-ot','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['f-date','f-hours','f-rate','f-exp','f-loc','f-note','f-km','f-tmin','f-dest','f-krate','f-tag'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('f-inv').value='unpaid';
   document.getElementById('f-otm').value='1';
   document.getElementById('f-bank').checked=false;
@@ -869,7 +870,7 @@ async function saveEntry(){
   const date=document.getElementById('f-date').value;
   if(!date){alert('Please enter a date.');return;}
   const hours=parseFloat(document.getElementById('f-hours').value)||0;
-  const ot=parseFloat(document.getElementById('f-ot').value)||0;
+  const ot=0; // OT calculated from weekly total automatically
   const rate=parseFloat(document.getElementById('f-rate').value)||0;
   const otm=parseFloat(document.getElementById('f-otm').value);
   const exp=parseFloat(document.getElementById('f-exp').value)||0;
