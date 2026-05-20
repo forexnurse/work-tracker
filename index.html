@@ -1444,6 +1444,327 @@ function render(){
   }).join('');
 }
 
+
+// ── Multi-tag system ──────────────────────────────────────
+let formTags = [];
+let selectedTags = new Set();
+let acHighlight = -1;
+
+function getAllTags(){
+  const tagSet = {};
+  entries.forEach(e => {
+    const tags = (e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
+    tags.forEach(t => { tagSet[t] = (tagSet[t]||0)+1; });
+  });
+  return tagSet;
+}
+
+function getTagSuggestions(query){
+  const all = getAllTags();
+  const q = query.toLowerCase();
+  return Object.entries(all)
+    .filter(([t]) => !formTags.includes(t) && (!q || t.toLowerCase().includes(q)))
+    .sort((a,b) => b[1]-a[1]);
+}
+
+function renderFormTags(){
+  const pills = document.getElementById('tag-pills');
+  if(!pills) return;
+  pills.innerHTML = formTags.map((t,i) => `<span class="tag-pill">${t}<button class="tag-pill-x" onclick="removeFormTag(${i})" tabindex="-1">×</button></span>`).join('');
+  const hidden = document.getElementById('f-tag');
+  if(hidden) hidden.value = formTags.join(',');
+}
+
+function removeFormTag(idx){ formTags.splice(idx,1); renderFormTags(); }
+
+function addFormTag(tag){
+  tag = tag.trim();
+  if(!tag || formTags.includes(tag)) return;
+  formTags.push(tag);
+  renderFormTags();
+  const inp = document.getElementById('tag-text');
+  if(inp) inp.value='';
+  hideTagAC();
+}
+
+function onTagInput(){ acHighlight=-1; showTagAC(); }
+
+function onTagKeydown(e){
+  const inp = document.getElementById('tag-text');
+  const ac = document.getElementById('tag-autocomplete');
+  const items = ac ? ac.querySelectorAll('.tag-ac-item') : [];
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    if(acHighlight>=0&&items[acHighlight]) addFormTag(items[acHighlight].dataset.tag);
+    else if(inp.value.trim()) addFormTag(inp.value);
+  } else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    acHighlight=Math.min(acHighlight+1,items.length-1);
+    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
+  } else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    acHighlight=Math.max(acHighlight-1,-1);
+    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
+  } else if(e.key==='Backspace'&&!inp.value&&formTags.length){
+    formTags.pop(); renderFormTags();
+  }
+}
+
+function showTagAC(){
+  const inp = document.getElementById('tag-text');
+  const ac = document.getElementById('tag-autocomplete');
+  if(!inp||!ac) return;
+  const suggestions = getTagSuggestions(inp.value);
+  if(!suggestions.length){ ac.classList.remove('open'); return; }
+  ac.innerHTML = suggestions.map(([t,c])=>`<div class="tag-ac-item" data-tag="${t}" onmousedown="addFormTag('${t}')"><span>🏷️</span><span>${t}</span><span class="ac-count">${c}×</span></div>`).join('');
+  ac.classList.add('open');
+}
+
+function hideTagAC(){ const ac=document.getElementById('tag-autocomplete'); if(ac) ac.classList.remove('open'); }
+function focusTagInput(){ const el=document.getElementById('tag-text'); if(el) el.focus(); }
+
+function setFormTags(tagStr){
+  formTags = (tagStr||'').split(',').map(t=>t.trim()).filter(Boolean);
+  renderFormTags();
+}
+
+function getFormTagString(){ return formTags.join(','); }
+
+// ── Tag filter ────────────────────────────────────────────
+function toggleTagFilterDropdown(){
+  const dd = document.getElementById('tag-filter-dropdown');
+  const isOpen = dd.classList.toggle('open');
+  if(isOpen){ renderTagFilterList(); setTimeout(()=>{ const s=document.getElementById('tag-filter-search'); if(s)s.focus(); },50); }
+}
+
+function renderTagFilterList(){
+  const query = (document.getElementById('tag-filter-search')||{}).value||'';
+  const all = getAllTags();
+  const filtered = Object.entries(all).filter(([t])=>!query||t.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b[1]-a[1]);
+  const list = document.getElementById('tag-filter-list');
+  if(!list) return;
+  if(!filtered.length){ list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--subtle);">No tags found</div>'; return; }
+  list.innerHTML = filtered.map(([t,c])=>`<div class="tag-filter-item"><input type="checkbox" ${selectedTags.has(t)?'checked':''} onchange="toggleTagFilter('${t}',this.checked)"/><span>${t}</span><span class="ac-count" style="margin-left:auto;font-size:11px;color:var(--subtle);">${c} entr${c===1?'y':'ies'}</span></div>`).join('');
+}
+
+function toggleTagFilter(tag,checked){
+  if(checked) selectedTags.add(tag); else selectedTags.delete(tag);
+  updateTagFilterUI(); render();
+}
+
+function clearTagFilter(){ selectedTags.clear(); updateTagFilterUI(); document.getElementById('tag-filter-dropdown').classList.remove('open'); render(); }
+
+function updateTagFilterUI(){
+  const btn=document.getElementById('tag-filter-btn');
+  const label=document.getElementById('tag-filter-label');
+  const pillsEl=document.getElementById('active-tag-pills');
+  const n=selectedTags.size;
+  if(btn) btn.classList.toggle('active',n>0);
+  if(label) label.textContent=n===0?'All tags':n+' tag'+(n===1?'':'s')+' selected';
+  if(pillsEl) pillsEl.innerHTML=[...selectedTags].map(t=>`<span class="filter-pill">🏷️ ${t}<button class="filter-pill-x" onclick="toggleTagFilter('${t}',false);renderTagFilterList()">×</button></span>`).join('');
+}
+
+function updateTagFilter(){ renderTagFilterList(); }
+
+// ── Locations system ──────────────────────────────────────
+let locations = [];
+
+async function loadLocations(){
+  try{ const d=await apiFetch('locations?select=*&order=name.asc'); locations=d||[]; }
+  catch(e){ locations=[]; }
+  populateLocSelect();
+  renderLocTable();
+}
+
+function populateLocSelect(){
+  const sel=document.getElementById('f-loc-select');
+  if(!sel) return;
+  sel.innerHTML='<option value="">— Select a saved location —</option>'+
+    locations.map(l=>`<option value="${l.id}">${l.name}${l.address?' — '+l.address:''}</option>`).join('')+
+    '<option value="__new__">＋ Add new location…</option>';
+}
+
+function onLocationSelect(){
+  const sel=document.getElementById('f-loc-select');
+  const val=sel.value;
+  if(val==='__new__'){ sel.value=''; openLocModal(); return; }
+  if(!val) return;
+  const loc=locations.find(l=>String(l.id)===String(val));
+  if(!loc) return;
+  const travelChk=document.getElementById('f-travel-chk');
+  if(loc.km>0||loc.tmin>0){
+    travelChk.checked=true; toggleTravel(true);
+    document.getElementById('f-km').value=loc.km||'';
+    document.getElementById('f-tmin').value=loc.tmin||'';
+    document.getElementById('f-krate').value=loc.krate||'';
+  }
+  document.getElementById('f-loc').value=loc.address||loc.name;
+  if(loc.code){ const existing=formTags.filter(t=>t!==loc.code); formTags=[loc.code,...existing]; renderFormTags(); }
+  updateFormCalc();
+  showToast('📍 '+loc.name+' loaded');
+}
+
+function openLocModal(){
+  document.getElementById('export-menu').classList.remove('open');
+  resetLocForm(); renderLocTable();
+  document.getElementById('loc-modal-overlay').classList.add('open');
+}
+function closeLocModal(ev){ if(ev.target===document.getElementById('loc-modal-overlay')) closeLocModalDirect(); }
+function closeLocModalDirect(){ document.getElementById('loc-modal-overlay').classList.remove('open'); }
+function resetLocForm(){
+  document.getElementById('loc-edit-id').value='';
+  ['loc-name','loc-address','loc-code','loc-km','loc-tmin','loc-krate'].forEach(id=>document.getElementById(id).value='');
+}
+function editLocationForm(id){
+  const loc=locations.find(l=>l.id===id); if(!loc) return;
+  document.getElementById('loc-edit-id').value=id;
+  document.getElementById('loc-name').value=loc.name||'';
+  document.getElementById('loc-address').value=loc.address||'';
+  document.getElementById('loc-code').value=loc.code||'';
+  document.getElementById('loc-km').value=loc.km||'';
+  document.getElementById('loc-tmin').value=loc.tmin||'';
+  document.getElementById('loc-krate').value=loc.krate||'';
+  document.getElementById('loc-name').focus();
+}
+async function saveLocation(){
+  const name=document.getElementById('loc-name').value.trim();
+  if(!name){ alert('Please enter a location name.'); return; }
+  const row={name,address:document.getElementById('loc-address').value.trim(),code:document.getElementById('loc-code').value.trim(),km:parseFloat(document.getElementById('loc-km').value)||0,tmin:parseFloat(document.getElementById('loc-tmin').value)||0,krate:parseFloat(document.getElementById('loc-krate').value)||0};
+  const editId=document.getElementById('loc-edit-id').value;
+  try{
+    if(editId) await apiFetch('locations?id=eq.'+editId,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    else await apiFetch('locations',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    showToast(editId?'Location updated':'Location saved');
+    resetLocForm(); await loadLocations();
+  }catch(e){ showToast('Error: '+e.message); }
+}
+async function deleteLocation(id){
+  if(!confirm('Delete this location?')) return;
+  try{ await apiFetch('locations?id=eq.'+id,{method:'DELETE'}); showToast('Location deleted'); await loadLocations(); }
+  catch(e){ showToast('Error deleting'); }
+}
+function renderLocTable(){
+  const wrap=document.getElementById('loc-table-wrap'); if(!wrap) return;
+  if(!locations.length){ wrap.innerHTML='<div class="loc-empty">No saved locations yet. Add one above!</div>'; return; }
+  wrap.innerHTML=`<table class="loc-table"><thead><tr><th>Name</th><th>Address</th><th>Code/Tag</th><th>KM</th><th>Time (min)</th><th>Rate</th><th></th></tr></thead><tbody>${locations.map(l=>`<tr><td><strong>${l.name}</strong></td><td style="font-size:12px;color:var(--muted);">${l.address||'—'}</td><td>${l.code?`<span class="badge b-tag">${l.code}</span>`:'—'}</td><td>${l.km?l.km+' km':'—'}</td><td>${l.tmin?l.tmin+' min':'—'}</td><td>${l.krate?'$'+parseFloat(l.krate).toFixed(2)+'/km':'—'}</td><td style="white-space:nowrap;"><button class="loc-edit-btn" onclick="editLocationForm(${l.id})">✏️ Edit</button><button class="loc-del-btn" onclick="deleteLocation(${l.id})">🗑️</button></td></tr>`).join('')}</tbody></table>`;
+}
+
+// ── Start/end time system ─────────────────────────────────
+function onHoursInput(){
+  const h=document.getElementById('f-hours').value;
+  const start=document.getElementById('f-start');
+  const end=document.getElementById('f-end');
+  const note=document.getElementById('time-calc-note');
+  if(h&&parseFloat(h)>0){
+    start.disabled=true; start.style.opacity='0.4';
+    end.disabled=true; end.style.opacity='0.4';
+    if(note) note.textContent='';
+  } else {
+    start.disabled=false; start.style.opacity='1';
+    end.disabled=false; end.style.opacity='1';
+  }
+  updateFormCalc();
+}
+
+function onTimeInput(){
+  const startVal=document.getElementById('f-start').value;
+  const endVal=document.getElementById('f-end').value;
+  const hoursEl=document.getElementById('f-hours');
+  const note=document.getElementById('time-calc-note');
+  if(startVal&&endVal){
+    const [sh,sm]=startVal.split(':').map(Number);
+    const [eh,em]=endVal.split(':').map(Number);
+    let totalMin=(eh*60+em)-(sh*60+sm);
+    if(totalMin<0) totalMin+=24*60;
+    const hrs=totalMin/60;
+    hoursEl.value=hrs.toFixed(2);
+    hoursEl.disabled=true; hoursEl.style.opacity='0.4';
+    if(note) note.textContent=`⏱ ${startVal} – ${endVal} = ${hrs.toFixed(2)}h calculated`;
+  } else if(!startVal&&!endVal){
+    hoursEl.disabled=false; hoursEl.style.opacity='1';
+    if(note) note.textContent='';
+  }
+  updateFormCalc();
+}
+
+function resetTimeFields(){
+  ['f-start','f-end'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.disabled=false;el.style.opacity='1';}});
+  const hoursEl=document.getElementById('f-hours');
+  if(hoursEl){hoursEl.disabled=false;hoursEl.style.opacity='1';}
+  const note=document.getElementById('time-calc-note');
+  if(note) note.textContent='';
+}
+
+// ── Pay period engine ─────────────────────────────────────
+let payPeriodOffset=0;
+
+function getSundayOfWeek(d){ const dt=new Date(d); dt.setHours(0,0,0,0); dt.setDate(dt.getDate()-dt.getDay()); return dt; }
+
+function getPayPeriod(offset){
+  const anchor=new Date('2026-04-13T00:00:00');
+  const anchorDay=anchor.getDay();
+  const firstSun=new Date(anchor);
+  firstSun.setDate(anchor.getDate()-anchorDay);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const msPerPeriod=14*86400000;
+  const elapsed=today-firstSun;
+  const currentPeriodNum=Math.floor(elapsed/msPerPeriod);
+  const targetNum=currentPeriodNum+offset;
+  const pStart=new Date(firstSun.getTime()+targetNum*msPerPeriod);
+  const pEnd=new Date(pStart.getTime()+13*86400000);
+  const payDay=new Date(pEnd.getTime()+86400000);
+  payDay.setDate(payDay.getDate()+5);
+  return{start:pStart,end:pEnd,payDay,num:targetNum};
+}
+
+function toDateStr(d){ return d.toISOString().split('T')[0]; }
+
+function shiftPayPeriod(dir){
+  payPeriodOffset+=dir;
+  if(payPeriodOffset>1) payPeriodOffset=1;
+  renderPayWidget();
+}
+
+function renderPayWidget(){
+  const pp=getPayPeriod(payPeriodOffset);
+  const start=toDateStr(pp.start);
+  const end=toDateStr(pp.end);
+  const today=new Date(); today.setHours(0,0,0,0);
+  const isCurrent=payPeriodOffset===0;
+  const isPast=payPeriodOffset<0;
+  let periodLabel=isCurrent?'Current':payPeriodOffset===1?'Next':payPeriodOffset===-1?'Previous':Math.abs(payPeriodOffset)+' periods ago';
+  const ppLabel=document.getElementById('pp-period-label');
+  if(ppLabel) ppLabel.textContent=periodLabel;
+  const periodEntries=entries.filter(e=>e.date>=start&&e.date<=end&&!e.hidden);
+  const paidEntries=periodEntries.filter(e=>!e.banked&&!e.hidden);
+  const totH=paidEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
+  const totOT=paidEntries.reduce((s,e)=>s+(e.ot||0),0);
+  const totBankedH=periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const totHrly=paidEntries.reduce((s,e)=>s+(e.hrly_pay||0),0);
+  const totKm=paidEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const totExp=paidEntries.reduce((s,e)=>s+(e.exp||0),0);
+  const total=paidEntries.reduce((s,e)=>s+(e.earned||0),0);
+  const outstanding=paidEntries.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+  const msPerPeriod=14*86400000;
+  const elapsedMs=Math.max(0,today-pp.start);
+  const progress=isCurrent?Math.min(100,(elapsedMs/msPerPeriod)*100):isPast?100:0;
+  const daysElapsed=isCurrent?Math.min(14,Math.floor(elapsedMs/86400000)):0;
+  const daysLeft=isCurrent?Math.max(0,14-daysElapsed):0;
+  const daysUntilPay=Math.ceil((pp.payDay-today)/86400000);
+  const payDayStr=pp.payDay.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
+  let payDayMsg=isPast?'✓ Paid '+pp.payDay.toLocaleDateString('en-CA',{month:'short',day:'numeric'}):daysUntilPay<=0?'🎉 Payday is today!':daysUntilPay===1?'🎉 Payday tomorrow!':`Payday ${payDayStr} (in ${daysUntilPay} days)`;
+  const datesStr=pp.start.toLocaleDateString('en-CA',{month:'short',day:'numeric'})+' – '+pp.end.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set('pp-dates',datesStr); set('pp-payday',payDayMsg);
+  set('pp-hours',fmt_h(totH+totOT));
+  const bs=document.getElementById('pp-banked-sub'); if(bs) bs.textContent=totBankedH>0?'🏦 '+fmt_h(totBankedH)+' banked':'';
+  set('pp-hrly',fmt(totHrly)); set('pp-km',fmt(totKm)); set('pp-exp',fmt(totExp)); set('pp-total',fmt(total));
+  const os=document.getElementById('pp-outstanding'); if(os) os.textContent=outstanding>0?fmt(outstanding)+' unpaid':(total>0?'✓ All paid':'');
+  const pb=document.getElementById('pp-progress'); if(pb) pb.style.width=progress.toFixed(1)+'%';
+  const de=document.getElementById('pp-days-elapsed'); if(de) de.textContent=isCurrent?daysElapsed+' of 14 days':'';
+  const dl=document.getElementById('pp-days-left'); if(dl) dl.textContent=isCurrent?daysLeft+' days left':'';
+}
+
 function filterByTag(tag){ selectedTags.clear(); selectedTags.add(tag); updateTagFilterUI(); render(); }
 function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
