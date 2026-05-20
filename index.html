@@ -934,7 +934,7 @@ async function saveEntry(){
       await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
       showToast(banking?'Entry saved — hours banked 🏦':'Entry saved ✓');
     }
-    updateLastSaved();closeForm();await loadEntries();
+    updateLastSaved();closeForm();await loadEntries();renderPayWidget();
   }catch(e){showToast('Error: '+e.message);}
 }
 
@@ -986,14 +986,14 @@ async function confirmDuplicate(id){
   document.getElementById('dup-picker-overlay').remove();
   try{
     await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
-    showToast('Duplicated to '+date);updateLastSaved();await loadEntries();
+    showToast('Duplicated to '+date);updateLastSaved();await loadEntries();renderPayWidget();
   }catch(e){showToast('Error duplicating');}
 }
 
 async function deleteEntry(id){
   if(window.event)window.event.stopPropagation();
   if(!confirm('Delete this entry?'))return;
-  try{await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast('Entry deleted');await loadEntries();}
+  try{await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast('Entry deleted');await loadEntries();renderPayWidget();}
   catch(e){showToast('Error deleting');}
 }
 
@@ -1013,8 +1013,13 @@ async function toggleHidden(id, hide){
 }
 
 async function updateInv(id,val){
-  try{await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({inv:val})});entries=entries.map(e=>e.id===id?{...e,inv:val}:e);updateLastSaved();render();}
-  catch(e){showToast('Error updating');}
+  try{
+    await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({inv:val})});
+    entries=entries.map(e=>e.id===id?{...e,inv:val}:e);
+    updateLastSaved();
+    render();
+    renderPayWidget();
+  }catch(e){showToast('Error updating');}
 }
 
 // ── Hour Bank ─────────────────────────────────────────────
@@ -1152,13 +1157,13 @@ async function applyBulkEdit(){
       }
       await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify(u)});
     }
-    showToast(n+' entr'+(n===1?'y':'ies')+' updated');updateLastSaved();closeBulkEdit();clearSelection();await loadEntries();
+    showToast(n+' entr'+(n===1?'y':'ies')+' updated');updateLastSaved();closeBulkEdit();clearSelection();await loadEntries();renderPayWidget();
   }catch(e){showToast('Error: '+e.message);}
 }
 async function bulkDelete(){
   const n=selectedIds.size;if(!n)return;
   if(!confirm(`Delete ${n} entr${n===1?'y':'ies'}?`))return;
-  try{for(const id of selectedIds)await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast(n+' deleted');selectedIds.clear();lastClickedIdx=null;await loadEntries();}
+  try{for(const id of selectedIds)await apiFetch('entries?id=eq.'+id,{method:'DELETE'});showToast(n+' deleted');selectedIds.clear();lastClickedIdx=null;await loadEntries();renderPayWidget();}
   catch(e){showToast('Error deleting');}
 }
 
