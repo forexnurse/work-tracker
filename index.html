@@ -339,6 +339,7 @@ tr.hidden-row:hover td{opacity:0.5;}
 </style>
 </head>
 <body>
+
 <div class="app">
 
   <div class="header">
@@ -1001,8 +1002,12 @@ async function toggleHidden(id, hide){
   const hiding = hide === true || hide === 'true';
   try{
     await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({hidden:hiding})});
+    // Update local array immediately so render uses correct value
     entries = entries.map(e=>e.id===id?{...e,hidden:hiding}:e);
-    showToast(hiding?'Entry excluded from calculations':'Entry restored to calculations');
+    showToast(hiding?'🚫 Entry excluded from calculations':'✅ Entry restored to calculations');
+    // Force full re-render with updated data
+    updateBulkBar();
+    renderPayWidget();
     render();
   }catch(e){showToast('Error updating entry');}
 }
@@ -1347,15 +1352,19 @@ function render(){
   const f=getFiltered();
 
   // Metrics
-  const totH=f.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
-  const totOT=f.reduce((s,e)=>s+(e.ot||0),0);
-  const totHrly=f.reduce((s,e)=>s+(e.hrly_pay||0),0);
-  const totKmEarn=f.reduce((s,e)=>s+(e.trav_earn||0),0);
-  const totKm=f.reduce((s,e)=>s+(e.km||0),0);
-  const totExp=f.reduce((s,e)=>s+(e.exp||0),0);
-  const totAll=f.reduce((s,e)=>s+(e.earned||0),0);
-  const outstanding=f.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
-  const totBankedPeriod=f.reduce((s,e)=>s+(e.banked_hours||0),0);
+  // Always exclude hidden entries from calculations
+  const fCalc = f.filter(e=>!e.hidden);
+  const totH=fCalc.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
+  const totOT=fCalc.reduce((s,e)=>s+(e.ot||0),0);
+  const totExp=fCalc.reduce((s,e)=>s+(e.exp||0),0);
+  const totHrly=fCalc.reduce((s,e)=>s+(e.hrly_pay||0),0);
+  const totKmEarn=fCalc.reduce((s,e)=>s+(e.trav_earn||0),0);
+  const totKm=fCalc.reduce((s,e)=>s+(e.km||0),0);
+  const totTmin=fCalc.reduce((s,e)=>s+(e.tmin||0),0);
+  const totAll=fCalc.reduce((s,e)=>s+(e.earned||0),0);
+  const outstanding=fCalc.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
+  const totBankedPeriod=fCalc.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const hiddenCount=f.filter(e=>e.hidden).length;
   const totalBanked=getTotalBanked();
 
   document.getElementById('m-hours').textContent=fmt_h(totH+totOT);
@@ -1386,7 +1395,12 @@ function render(){
     document.getElementById('bank-alert-msg').textContent=`🏦 You have ${fmt_h(totalBanked)} banked (≈ ${fmt(totalBanked*(parseFloat(getLast('rate'))||0))}). Click the piggy bank to withdraw.`;
   }else bankAlert.classList.remove('show');
 
-  // Select-all
+  // Hidden count badge
+  const hidBadge=document.getElementById('hidden-count-badge');
+  const totalHidden=entries.filter(e=>e.hidden).length;
+  if(hidBadge) hidBadge.innerHTML=totalHidden>0?`<span class="hidden-badge">🚫 ${totalHidden} excluded</span>`:'';
+
+  // Select-all checkbox
   const sa=document.getElementById('select-all');
   if(sa){sa.checked=f.length>0&&f.every(e=>selectedIds.has(e.id));sa.indeterminate=!sa.checked&&f.some(e=>selectedIds.has(e.id));}
 
@@ -1422,7 +1436,7 @@ function render(){
       <td><div class="note-tooltip-wrap"><span class="note-cell">${e.note?e.note.substring(0,18)+(e.note.length>18?'…':''):'—'}</span>${e.note&&e.note.length>0?`<div class="note-tooltip">${(e.note).replace(/</g,'&lt;')}</div>`:''}</div></td>
       <td onclick="event.stopPropagation()"><div class="actions-cell">
         <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit entry">✏️</button>
-        <button class="act-btn dup"  onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">📋</button>
+        <button class="act-btn dup"  onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate">📋</button>
         <button class="act-btn hide ${e.hidden?'is-hidden':''}" onclick="event.stopPropagation();toggleHidden(${e.id},${e.hidden?'false':'true'});" title="${e.hidden?'Restore to calculations':'Exclude from calculations'}">${e.hidden?'🚫':'👁️'}</button>
         <button class="act-btn del"  onclick="event.stopPropagation();deleteEntry(${e.id});" title="Delete entry">🗑️</button>
       </div></td>
@@ -1430,486 +1444,14 @@ function render(){
   }).join('');
 }
 
-
-// ── Pay period engine ─────────────────────────────────────
-// Bi-weekly pay periods: Sun–Sat, paid the following Friday
-// Job start: April 13, 2026. First full period anchor: Sun April 13.
-// Periods are 2 weeks (14 days) Sun to Sat.
-let payPeriodOffset = 0;  // 0 = current, -1 = previous, +1 = next
-
-function getSundayOfWeek(d){
-  const dt = new Date(d);
-  dt.setHours(0,0,0,0);
-  const day = dt.getDay(); // 0=Sun
-  dt.setDate(dt.getDate() - day);
-  return dt;
-}
-
-function getPayPeriod(offset){
-  // Anchor: first Sunday on or after April 13 2026
-  const anchor = new Date('2026-04-13T00:00:00');
-  const anchorDay = anchor.getDay();
-  // April 13 is a Monday (day 1), so first Sunday is April 12 — go back to find it
-  const firstSun = new Date(anchor);
-  firstSun.setDate(anchor.getDate() - anchorDay); // Sunday of that week
-
-  // Find current period number from firstSun
-  const today = new Date(); today.setHours(0,0,0,0);
-  const msPerPeriod = 14 * 86400000;
-  const elapsed = today - firstSun;
-  const currentPeriodNum = Math.floor(elapsed / msPerPeriod);
-  const targetNum = currentPeriodNum + offset;
-
-  // Period runs Sun to Sat (13 days later)
-  const pStart = new Date(firstSun.getTime() + targetNum * msPerPeriod);
-  const pEnd = new Date(pStart.getTime() + 13 * 86400000); // Saturday
-  // Payday: Friday of the week after period ends
-  const payDay = new Date(pEnd.getTime() + 86400000); // Sunday after period
-  payDay.setDate(payDay.getDate() + 5); // Friday
-
-  return { start: pStart, end: pEnd, payDay, num: targetNum };
-}
-
-function toDateStr(d){
-  return d.toISOString().split('T')[0];
-}
-
-function shiftPayPeriod(dir){
-  payPeriodOffset += dir;
-  // Prevent going into future beyond next period
-  if(payPeriodOffset > 1) payPeriodOffset = 1;
-  renderPayWidget();
-}
-
-function renderPayWidget(){
-  const pp = getPayPeriod(payPeriodOffset);
-  const start = toDateStr(pp.start);
-  const end = toDateStr(pp.end);
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayStr = toDateStr(today);
-  const isCurrent = payPeriodOffset === 0;
-  const isPast = payPeriodOffset < 0;
-  const isNext = payPeriodOffset > 0;
-
-  // Period label
-  let periodLabel = '';
-  if(isCurrent) periodLabel = 'Current';
-  else if(isNext) periodLabel = 'Next';
-  else if(payPeriodOffset === -1) periodLabel = 'Previous';
-  else periodLabel = payPeriodOffset + ' periods ago';
-  document.getElementById('pp-period-label').textContent = periodLabel;
-
-  // Filter entries — include banked entries for hours but not for pay
-  const periodEntries = entries.filter(e => e.date >= start && e.date <= end && !e.hidden);
-  const paidEntries = periodEntries.filter(e => !e.banked && !e.hidden);
-  const totH = paidEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
-  const totOT = paidEntries.reduce((s,e)=>s+(e.ot||0),0);
-  const totBankedH = periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
-  const totHrly = paidEntries.reduce((s,e)=>s+(e.hrly_pay||0),0);
-  const totKm = paidEntries.reduce((s,e)=>s+(e.trav_earn||0),0);
-  const totExp = paidEntries.reduce((s,e)=>s+(e.exp||0),0);
-  const total = paidEntries.reduce((s,e)=>s+(e.earned||0),0);
-  const outstanding = paidEntries.filter(e=>e.inv!=='paid').reduce((s,e)=>s+(e.earned||0),0);
-
-  // Progress
-  const msPerPeriod = 14 * 86400000;
-  const elapsedMs = Math.max(0, today - pp.start);
-  const progress = isCurrent ? Math.min(100, (elapsedMs / msPerPeriod) * 100) : isPast ? 100 : 0;
-  const daysElapsed = isCurrent ? Math.min(14, Math.floor(elapsedMs / 86400000)) : 0;
-  const daysLeft = isCurrent ? Math.max(0, 14 - daysElapsed) : 0;
-
-  // Payday
-  const payDayStr = pp.payDay.toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'});
-  const daysUntilPay = Math.ceil((pp.payDay - today) / 86400000);
-  let payDayMsg = '';
-  if(isPast) payDayMsg = '✓ Paid ' + pp.payDay.toLocaleDateString('en-CA',{month:'short',day:'numeric'});
-  else if(daysUntilPay <= 0) payDayMsg = '🎉 Payday is today!';
-  else if(daysUntilPay === 1) payDayMsg = '🎉 Payday tomorrow!';
-  else payDayMsg = `Payday ${payDayStr} (in ${daysUntilPay} days)`;
-
-  // Dates display
-  const datesStr = pp.start.toLocaleDateString('en-CA',{month:'short',day:'numeric'}) + ' – ' +
-    pp.end.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'});
-
-  document.getElementById('pp-dates').textContent = datesStr;
-  document.getElementById('pp-payday').textContent = payDayMsg;
-  document.getElementById('pp-hours').textContent = fmt_h(totH + totOT);
-  document.getElementById('pp-banked-sub').textContent = totBankedH > 0 ? '🏦 '+fmt_h(totBankedH)+' banked' : '';
-  document.getElementById('pp-hrly').textContent = fmt(totHrly);
-  document.getElementById('pp-km').textContent = fmt(totKm);
-  document.getElementById('pp-exp').textContent = fmt(totExp);
-  document.getElementById('pp-total').textContent = fmt(total);
-  document.getElementById('pp-outstanding').textContent = outstanding > 0 ? fmt(outstanding)+' unpaid' : (total > 0 ? '✓ All paid' : '');
-  document.getElementById('pp-progress').style.width = progress.toFixed(1)+'%';
-  document.getElementById('pp-days-elapsed').textContent = isCurrent ? daysElapsed+' of 14 days' : '';
-  document.getElementById('pp-days-left').textContent = isCurrent ? daysLeft+' days left' : '';
-}
-
-
-// ── Multi-tag system ──────────────────────────────────────
-let formTags = [];        // tags currently in the form
-let selectedTags = new Set(); // tags selected in filter
-let acHighlight = -1;
-
-function getAllTags(){
-  // Collect all unique tags from all entries (tags stored as comma-separated)
-  const tagSet = {};
-  entries.forEach(e => {
-    const tags = (e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
-    tags.forEach(t => { tagSet[t] = (tagSet[t]||0)+1; });
-  });
-  return tagSet; // {tagName: count}
-}
-
-function getTagSuggestions(query){
-  const all = getAllTags();
-  const q = query.toLowerCase();
-  return Object.entries(all)
-    .filter(([t]) => !formTags.includes(t) && (!q || t.toLowerCase().includes(q)))
-    .sort((a,b) => b[1]-a[1]); // sort by frequency
-}
-
-function renderFormTags(){
-  const pills = document.getElementById('tag-pills');
-  if(!pills) return;
-  pills.innerHTML = formTags.map((t,i) => `
-    <span class="tag-pill">${t}<button class="tag-pill-x" onclick="removeFormTag(${i})" tabindex="-1">×</button></span>
-  `).join('');
-  // Update hidden input
-  const hidden = document.getElementById('f-tag');
-  if(hidden) hidden.value = formTags.join(',');
-}
-
-function removeFormTag(idx){
-  formTags.splice(idx,1);
-  renderFormTags();
-}
-
-function addFormTag(tag){
-  tag = tag.trim();
-  if(!tag || formTags.includes(tag)) return;
-  formTags.push(tag);
-  renderFormTags();
-  const inp = document.getElementById('tag-text');
-  if(inp){ inp.value=''; }
-  hideTagAC();
-}
-
-function focusTagInput(){ const el=document.getElementById("tag-text"); if(el) el.focus(); }
-function onTagInput(){
-  acHighlight = -1;
-  showTagAC();
-}
-
-function onTagKeydown(e){
-  const inp = document.getElementById('tag-text');
-  const ac = document.getElementById('tag-autocomplete');
-  const items = ac.querySelectorAll('.tag-ac-item');
-  if(e.key==='Enter'||e.key===','){
-    e.preventDefault();
-    if(acHighlight>=0 && items[acHighlight]){
-      addFormTag(items[acHighlight].dataset.tag);
-    } else if(inp.value.trim()){
-      addFormTag(inp.value);
-    }
-  } else if(e.key==='ArrowDown'){
-    e.preventDefault();
-    acHighlight = Math.min(acHighlight+1, items.length-1);
-    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
-  } else if(e.key==='ArrowUp'){
-    e.preventDefault();
-    acHighlight = Math.max(acHighlight-1, -1);
-    items.forEach((el,i)=>el.classList.toggle('highlighted',i===acHighlight));
-  } else if(e.key==='Backspace' && !inp.value && formTags.length){
-    formTags.pop(); renderFormTags();
-  }
-}
-
-function showTagAC(){
-  const inp = document.getElementById('tag-text');
-  const ac = document.getElementById('tag-autocomplete');
-  if(!inp||!ac) return;
-  const suggestions = getTagSuggestions(inp.value);
-  if(!suggestions.length){ ac.classList.remove('open'); return; }
-  ac.innerHTML = suggestions.map(([t,c])=>
-    `<div class="tag-ac-item" data-tag="${t}" onmousedown="addFormTag('${t}')">
-      <span>🏷️</span><span>${t}</span><span class="ac-count">${c}×</span>
-    </div>`
-  ).join('');
-  ac.classList.add('open');
-}
-
-function hideTagAC(){
-  const ac = document.getElementById('tag-autocomplete');
-  if(ac) ac.classList.remove('open');
-}
-
-function setFormTags(tagStr){
-  formTags = (tagStr||'').split(',').map(t=>t.trim()).filter(Boolean);
-  renderFormTags();
-}
-
-function getFormTagString(){
-  return formTags.join(',');
-}
-
-// ── Tag filter ────────────────────────────────────────────
-function toggleTagFilterDropdown(){
-  const dd = document.getElementById('tag-filter-dropdown');
-  const isOpen = dd.classList.toggle('open');
-  if(isOpen){ renderTagFilterList(); setTimeout(()=>document.getElementById('tag-filter-search').focus(),50); }
-}
-document.addEventListener('click', e=>{
-  if(!e.target.closest('.tag-filter-wrap')) document.getElementById('tag-filter-dropdown').classList.remove('open');
-});
-
-function renderTagFilterList(){
-  const query = (document.getElementById('tag-filter-search').value||'').toLowerCase();
-  const all = getAllTags();
-  const filtered = Object.entries(all).filter(([t])=>!query||t.toLowerCase().includes(query)).sort((a,b)=>b[1]-a[1]);
-  const list = document.getElementById('tag-filter-list');
-  if(!filtered.length){ list.innerHTML='<div style="padding:10px 14px;font-size:12px;color:var(--subtle);">No tags found</div>'; return; }
-  list.innerHTML = filtered.map(([t,c])=>`
-    <div class="tag-filter-item">
-      <input type="checkbox" ${selectedTags.has(t)?'checked':''} onchange="toggleTagFilter('${t}',this.checked)"/>
-      <span>${t}</span>
-      <span class="ac-count" style="margin-left:auto;font-size:11px;color:var(--subtle);">${c} entr${c===1?'y':'ies'}</span>
-    </div>`).join('');
-}
-
-function toggleTagFilter(tag, checked){
-  if(checked) selectedTags.add(tag);
-  else selectedTags.delete(tag);
-  updateTagFilterUI();
-  render();
-}
-
-function clearTagFilter(){
-  selectedTags.clear();
-  updateTagFilterUI();
-  document.getElementById('tag-filter-dropdown').classList.remove('open');
-  render();
-}
-
-function updateTagFilterUI(){
-  const btn = document.getElementById('tag-filter-btn');
-  const label = document.getElementById('tag-filter-label');
-  const pillsEl = document.getElementById('active-tag-pills');
-  const n = selectedTags.size;
-  btn.classList.toggle('active', n>0);
-  label.textContent = n===0 ? 'All tags' : n+' tag'+(n===1?'':'s')+' selected';
-  pillsEl.innerHTML = [...selectedTags].map(t=>
-    `<span class="filter-pill">🏷️ ${t}<button class="filter-pill-x" onclick="toggleTagFilter('${t}',false);renderTagFilterList()">×</button></span>`
-  ).join('');
-}
-
-function updateTagFilter(){ renderTagFilterList(); }
-
-
-// ── Locations system ──────────────────────────────────────
-let locations = [];
-
-async function loadLocations(){
-  try{
-    const d = await apiFetch('locations?select=*&order=name.asc');
-    locations = d || [];
-  } catch(e){ locations = []; }
-  populateLocSelect();
-  renderLocTable();
-}
-
-function populateLocSelect(){
-  const sel = document.getElementById('f-loc-select');
-  if(!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">— Select a saved location —</option>' +
-    locations.map(l => `<option value="${l.id}">${l.name}${l.address?' — '+l.address:''}</option>`).join('') +
-    '<option value="__new__">＋ Add new location…</option>';
-  if(cur) sel.value = cur;
-}
-
-function onLocationSelect(){
-  const sel = document.getElementById('f-loc-select');
-  const val = sel.value;
-  if(val === '__new__'){
-    sel.value = '';
-    openLocModal();
-    return;
-  }
-  if(!val) return;
-  const loc = locations.find(l => String(l.id) === String(val));
-  if(!loc) return;
-  // Auto-fill displacement fields
-  const travelChk = document.getElementById('f-travel-chk');
-  if(loc.km > 0 || loc.tmin > 0){
-    travelChk.checked = true;
-    toggleTravel(true);
-    document.getElementById('f-km').value = loc.km || '';
-    document.getElementById('f-tmin').value = loc.tmin || '';
-    document.getElementById('f-krate').value = loc.krate || '';
-  }
-  // Auto-fill location text
-  document.getElementById('f-loc').value = loc.address || loc.name;
-  // Auto-fill tag/code
-  if(loc.code){
-    const existing = formTags.filter(t => t !== loc.code);
-    formTags = [loc.code, ...existing];
-    renderFormTags();
-  }
-  updateFormCalc();
-  showToast('📍 '+loc.name+' loaded');
-}
-
-// Locations modal
-function openLocModal(){
-  document.getElementById('export-menu').classList.remove('open');
-  resetLocForm();
-  renderLocTable();
-  document.getElementById('loc-modal-overlay').classList.add('open');
-}
-function closeLocModal(ev){ if(ev.target===document.getElementById('loc-modal-overlay')) closeLocModalDirect(); }
-function closeLocModalDirect(){ document.getElementById('loc-modal-overlay').classList.remove('open'); }
-
-function resetLocForm(){
-  document.getElementById('loc-edit-id').value = '';
-  ['loc-name','loc-address','loc-code','loc-km','loc-tmin','loc-krate'].forEach(id => document.getElementById(id).value = '');
-}
-
-function editLocationForm(id){
-  const loc = locations.find(l => l.id === id);
-  if(!loc) return;
-  document.getElementById('loc-edit-id').value = id;
-  document.getElementById('loc-name').value = loc.name || '';
-  document.getElementById('loc-address').value = loc.address || '';
-  document.getElementById('loc-code').value = loc.code || '';
-  document.getElementById('loc-km').value = loc.km || '';
-  document.getElementById('loc-tmin').value = loc.tmin || '';
-  document.getElementById('loc-krate').value = loc.krate || '';
-  document.getElementById('loc-name').focus();
-  document.getElementById('loc-modal-overlay').scrollTop = 0;
-}
-
-async function saveLocation(){
-  const name = document.getElementById('loc-name').value.trim();
-  if(!name){ alert('Please enter a location name.'); return; }
-  const row = {
-    name,
-    address: document.getElementById('loc-address').value.trim(),
-    code: document.getElementById('loc-code').value.trim(),
-    km: parseFloat(document.getElementById('loc-km').value)||0,
-    tmin: parseFloat(document.getElementById('loc-tmin').value)||0,
-    krate: parseFloat(document.getElementById('loc-krate').value)||0,
-  };
-  const editId = document.getElementById('loc-edit-id').value;
-  try{
-    if(editId){
-      await apiFetch('locations?id=eq.'+editId, {method:'PATCH', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
-      showToast('Location updated');
-    } else {
-      await apiFetch('locations', {method:'POST', headers:{'Prefer':'return=minimal'}, body:JSON.stringify(row)});
-      showToast('Location saved');
-    }
-    resetLocForm();
-    await loadLocations();
-  } catch(e){ showToast('Error saving location: '+e.message); }
-}
-
-async function deleteLocation(id){
-  if(!confirm('Delete this location?')) return;
-  try{
-    await apiFetch('locations?id=eq.'+id, {method:'DELETE'});
-    showToast('Location deleted');
-    await loadLocations();
-  } catch(e){ showToast('Error deleting'); }
-}
-
-function renderLocTable(){
-  const wrap = document.getElementById('loc-table-wrap');
-  if(!wrap) return;
-  if(!locations.length){
-    wrap.innerHTML = '<div class="loc-empty">No saved locations yet. Add one above!</div>';
-    return;
-  }
-  wrap.innerHTML = `<table class="loc-table">
-    <thead><tr>
-      <th>Name</th><th>Address</th><th>Code/Tag</th><th>KM</th><th>Time</th><th>Rate</th><th></th>
-    </tr></thead>
-    <tbody>${locations.map(l=>`<tr>
-      <td><strong>${l.name}</strong></td>
-      <td style="font-size:12px;color:var(--muted);">${l.address||'—'}</td>
-      <td>${l.code?`<span class="badge b-tag">${l.code}</span>`:'—'}</td>
-      <td>${l.km?l.km+' km':'—'}</td>
-      <td>${l.tmin?l.tmin+' min':'—'}</td>
-      <td>${l.krate?'$'+parseFloat(l.krate).toFixed(2)+'/km':'—'}</td>
-      <td style="white-space:nowrap;">
-        <button class="loc-edit-btn" onclick="editLocationForm(${l.id})">✏️ Edit</button>
-        <button class="loc-del-btn" onclick="deleteLocation(${l.id})">🗑️</button>
-      </td>
-    </tr>`).join('')}</tbody>
-  </table>`;
-}
-
-// ── Start/end time system ─────────────────────────────────
-function onHoursInput(){
-  const h = document.getElementById('f-hours').value;
-  const start = document.getElementById('f-start');
-  const end = document.getElementById('f-end');
-  const note = document.getElementById('time-calc-note');
-  if(h && parseFloat(h) > 0){
-    // Grey out time fields
-    start.disabled = true; start.style.opacity = '0.4';
-    end.disabled = true; end.style.opacity = '0.4';
-    if(note) note.textContent = '';
-  } else {
-    start.disabled = false; start.style.opacity = '1';
-    end.disabled = false; end.style.opacity = '1';
-  }
-  updateFormCalc();
-}
-
-function onTimeInput(){
-  const startVal = document.getElementById('f-start').value;
-  const endVal = document.getElementById('f-end').value;
-  const hoursEl = document.getElementById('f-hours');
-  const note = document.getElementById('time-calc-note');
-  if(startVal && endVal){
-    // Calculate hours from times
-    const [sh,sm] = startVal.split(':').map(Number);
-    const [eh,em] = endVal.split(':').map(Number);
-    let totalMin = (eh*60+em) - (sh*60+sm);
-    if(totalMin < 0) totalMin += 24*60; // past midnight
-    const hrs = totalMin/60;
-    hoursEl.value = hrs.toFixed(2);
-    hoursEl.disabled = true;
-    hoursEl.style.opacity = '0.4';
-    if(note) note.textContent = `⏱ ${startVal} – ${endVal} = ${hrs.toFixed(2)}h calculated`;
-  } else if(!startVal && !endVal){
-    hoursEl.disabled = false;
-    hoursEl.style.opacity = '1';
-    if(note) note.textContent = '';
-  }
-  updateFormCalc();
-}
-
-function resetTimeFields(){
-  ['f-start','f-end'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el){ el.value=''; el.disabled=false; el.style.opacity='1'; }
-  });
-  const hoursEl = document.getElementById('f-hours');
-  if(hoursEl){ hoursEl.disabled=false; hoursEl.style.opacity='1'; }
-  const note = document.getElementById('time-calc-note');
-  if(note) note.textContent = '';
-}
-
-
 function filterByTag(tag){ selectedTags.clear(); selectedTags.add(tag); updateTagFilterUI(); render(); }
 function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-// ── Startup: ensure new DB columns ────────────────────────
+// ── Startup ───────────────────────────────────────────────
 async function ensureColumns(){
-  try{await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay&limit=1');window.hasTagCol=true;}
-  catch(e){window.hasTagCol=false;}
+  try{
+    await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay,start_time,end_time,hidden&limit=1');window.hasTagCol=true;
+  }catch(e){window.hasTagCol=false;}
 }
 ensureColumns().then(()=>{ loadEntries(); loadLocations(); });
 </script>
