@@ -447,8 +447,8 @@ tr.hidden-row:hover td{opacity:0.5;}
       <option value="paid">Paid only</option>
     </select>
     <select class="filter-select" id="filter-hidden" onchange="render()">
+      <option value="all">Show all entries</option>
       <option value="visible">Hide excluded</option>
-      <option value="all">Show all</option>
       <option value="hidden">Excluded only</option>
     </select>
     <div class="ot-threshold-wrap">
@@ -1017,7 +1017,7 @@ function getWithdrawals(){try{return JSON.parse(localStorage.getItem(BANK_KEY)||
 function saveWithdrawals(w){localStorage.setItem(BANK_KEY,JSON.stringify(w));}
 
 function getTotalBanked(){
-  const bankedIn=entries.reduce((s,e)=>s+(e.banked_hours||0),0);
+  const bankedIn=entries.filter(e=>!e.hidden).reduce((s,e)=>s+(e.banked_hours||0),0);
   const withdrawn=getWithdrawals().reduce((s,w)=>s+w.hours,0);
   return Math.max(0,bankedIn-withdrawn);
 }
@@ -1076,7 +1076,7 @@ function getFiltered(){
   const{start,end}=getPeriodRange(currentPeriod,periodOffset);
   const invF=document.getElementById('filter-inv').value;
   const bankF=document.getElementById('filter-bank').value;
-  const hiddenF=document.getElementById('filter-hidden')?document.getElementById('filter-hidden').value:'visible';
+  const hiddenF=document.getElementById('filter-hidden')?document.getElementById('filter-hidden').value:'all';
   return entries.filter(e=>{
     if(e.date<start||e.date>end)return false;
     // Multi-tag filter
@@ -1088,9 +1088,10 @@ function getFiltered(){
     if(invF&&e.inv!==invF)return false;
     if(bankF==='banked'&&!e.banked)return false;
     if(bankF==='paid'&&e.banked)return false;
-    // Hidden filter - always show in table but exclude from calculations
-    if(hiddenF==='hidden'&&!e.hidden)return false;
-    if(hiddenF==='visible'&&e.hidden)return false; // hide completely if filter is visible-only
+    // Hidden filter - only filters TABLE VIEW, not calculations
+    if(hiddenF==='hidden'&&!e.hidden)return false;   // show excluded only
+    if(hiddenF==='visible'&&e.hidden)return false;   // hide excluded from view only
+    // 'all' = show everything (default)
     return true;
   });
 }
@@ -1500,7 +1501,7 @@ function renderPayWidget(){
 
   // Filter entries — include banked entries for hours but not for pay
   const periodEntries = entries.filter(e => e.date >= start && e.date <= end && !e.hidden);
-  const paidEntries = periodEntries.filter(e => !e.banked);
+  const paidEntries = periodEntries.filter(e => !e.banked && !e.hidden);
   const totH = paidEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
   const totOT = paidEntries.reduce((s,e)=>s+(e.ot||0),0);
   const totBankedH = periodEntries.reduce((s,e)=>s+(e.banked_hours||0),0);
