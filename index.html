@@ -328,6 +328,14 @@ body.dark .loc-select{background:#0F172A;}
 .note-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1C1917;color:#fff;font-size:12px;padding:8px 12px;border-radius:8px;white-space:pre-wrap;max-width:260px;min-width:120px;z-index:400;box-shadow:0 4px 16px rgba(0,0,0,.2);line-height:1.5;word-break:break-word;}
 .note-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1C1917;}
 .note-tooltip-wrap:hover .note-tooltip{display:block;}
+
+/* Hidden entries */
+tr.hidden-row td{opacity:0.35;text-decoration:line-through;text-decoration-color:var(--subtle);}
+tr.hidden-row:hover td{opacity:0.5;}
+.act-btn.hide{color:var(--green-m);}
+.act-btn.hide.is-hidden{color:var(--subtle);}
+.act-btn.hide:hover{background:var(--green-l);}
+.hidden-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:var(--border);color:var(--subtle);font-weight:600;margin-left:3px;}
 </style>
 </head>
 <body>
@@ -438,6 +446,11 @@ body.dark .loc-select{background:#0F172A;}
       <option value="banked">Banked only</option>
       <option value="paid">Paid only</option>
     </select>
+    <select class="filter-select" id="filter-hidden" onchange="render()">
+      <option value="visible">Hide excluded</option>
+      <option value="all">Show all</option>
+      <option value="hidden">Excluded only</option>
+    </select>
     <div class="ot-threshold-wrap">
       <i class="ti ti-alert-triangle" style="color:#D97706;"></i>
       <span>OT after</span>
@@ -484,7 +497,7 @@ body.dark .loc-select{background:#0F172A;}
   </div>
 
   <div class="section-head">
-    <h2>Time log</h2>
+    <h2>Time log <span id="hidden-count-badge"></span></h2>
     <span class="select-hint">Hold <kbd style="font-size:10px;background:#eee;padding:1px 5px;border-radius:3px;border:1px solid #ccc;">Shift</kbd> + click to multi-select</span>
   </div>
 
@@ -617,7 +630,7 @@ body.dark .loc-select{background:#0F172A;}
         <th style="width:70px;">Tag</th>
         <th style="width:80px;">Invoice</th>
         <th style="width:80px;">Notes</th>
-        <th style="width:100px;min-width:100px;">Actions</th>
+        <th style="width:120px;min-width:120px;">Actions</th>
       </tr></thead>
       <tbody id="log-body"></tbody>
     </table>
@@ -983,6 +996,17 @@ async function deleteEntry(id){
   catch(e){showToast('Error deleting');}
 }
 
+async function toggleHidden(id, hide){
+  if(window.event)window.event.stopPropagation();
+  const hiding = hide === true || hide === 'true';
+  try{
+    await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({hidden:hiding})});
+    entries = entries.map(e=>e.id===id?{...e,hidden:hiding}:e);
+    showToast(hiding?'Entry excluded from calculations':'Entry restored to calculations');
+    render();
+  }catch(e){showToast('Error updating entry');}
+}
+
 async function updateInv(id,val){
   try{await apiFetch('entries?id=eq.'+id,{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({inv:val})});entries=entries.map(e=>e.id===id?{...e,inv:val}:e);updateLastSaved();render();}
   catch(e){showToast('Error updating');}
@@ -1052,9 +1076,10 @@ function getFiltered(){
   const{start,end}=getPeriodRange(currentPeriod,periodOffset);
   const invF=document.getElementById('filter-inv').value;
   const bankF=document.getElementById('filter-bank').value;
+  const hiddenF=document.getElementById('filter-hidden')?document.getElementById('filter-hidden').value:'visible';
   return entries.filter(e=>{
     if(e.date<start||e.date>end)return false;
-    // Multi-tag filter: entry must have ALL selected tags (OR logic: ANY selected tag)
+    // Multi-tag filter
     if(selectedTags.size>0){
       const entryTags=(e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
       const hasAny=[...selectedTags].some(t=>entryTags.includes(t));
@@ -1063,6 +1088,9 @@ function getFiltered(){
     if(invF&&e.inv!==invF)return false;
     if(bankF==='banked'&&!e.banked)return false;
     if(bankF==='paid'&&e.banked)return false;
+    // Hidden filter - always show in table but exclude from calculations
+    if(hiddenF==='hidden'&&!e.hidden)return false;
+    if(hiddenF==='visible'&&e.hidden)return false; // hide completely if filter is visible-only
     return true;
   });
 }
@@ -1079,6 +1107,10 @@ function updateBulkBar(){
   const n=selectedIds.size;
   document.getElementById('bulk-bar').classList.toggle('show',n>0);
   if(n>0)document.getElementById('bulk-count').textContent=n+' entr'+(n===1?'y':'ies')+' selected';
+  // Show hidden count badge
+  const hidBadge=document.getElementById('hidden-count-badge');
+  const totalHidden=entries.filter(e=>e.hidden).length;
+  if(hidBadge) hidBadge.innerHTML=totalHidden>0?`<span class="hidden-badge">🚫 ${totalHidden} excluded</span>`:'';
   const sa=document.getElementById('select-all');
   if(sa){const f=getFiltered();sa.checked=f.length>0&&f.every(e=>selectedIds.has(e.id));sa.indeterminate=!sa.checked&&f.some(e=>selectedIds.has(e.id));}
 }
@@ -1370,7 +1402,7 @@ function render(){
     const entryTags=(e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
     const tagCell=entryTags.length?entryTags.map(t=>`<span class="badge b-tag" onclick="filterByTag('${t}')" style="cursor:pointer;margin-right:2px;">${t}</span>`).join(''):'<span style="color:#ccc;">—</span>';
     const breakdown=e.banked?`<div class="breakdown">🏦 ${fmt_h(e.banked_hours||0)} banked</div>`:(e.tmin>0?`<div class="breakdown">incl. ${fmtMin(e.tmin)} travel</div>`:'');
-    return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
+    return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''} ${e.hidden?'hidden-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" ${sel?'checked':''} onchange="toggleRowCb(${e.id},this.checked)"/></td>
       <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${e.date}</td>
       <td>${fmt_h((e.hours||0)+(e.ot||0))}${otTag}${bankTag}${breakdown}</td>
@@ -1390,6 +1422,7 @@ function render(){
       <td onclick="event.stopPropagation()"><div class="actions-cell">
         <button class="act-btn edit" onclick="event.stopPropagation();editEntry(${e.id});" title="Edit entry">✏️</button>
         <button class="act-btn dup"  onclick="event.stopPropagation();duplicateEntry(${e.id});" title="Duplicate to today">📋</button>
+        <button class="act-btn hide ${e.hidden?'is-hidden':''}" onclick="event.stopPropagation();toggleHidden(${e.id},${e.hidden?'false':'true'});" title="${e.hidden?'Restore to calculations':'Exclude from calculations'}">${e.hidden?'🚫':'👁️'}</button>
         <button class="act-btn del"  onclick="event.stopPropagation();deleteEntry(${e.id});" title="Delete entry">🗑️</button>
       </div></td>
     </tr>`;
@@ -1466,7 +1499,7 @@ function renderPayWidget(){
   document.getElementById('pp-period-label').textContent = periodLabel;
 
   // Filter entries — include banked entries for hours but not for pay
-  const periodEntries = entries.filter(e => e.date >= start && e.date <= end);
+  const periodEntries = entries.filter(e => e.date >= start && e.date <= end && !e.hidden);
   const paidEntries = periodEntries.filter(e => !e.banked);
   const totH = paidEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
   const totOT = paidEntries.reduce((s,e)=>s+(e.ot||0),0);
