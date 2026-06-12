@@ -336,6 +336,55 @@ tr.hidden-row:hover td{opacity:0.5;}
 .act-btn.hide.is-hidden{color:var(--subtle);}
 .act-btn.hide:hover{background:var(--green-l);}
 .hidden-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:99px;background:var(--border);color:var(--subtle);font-weight:600;margin-left:3px;}
+
+/* OT Review Panel */
+.ot-review-panel{background:var(--card);border:2px solid var(--amber-m);border-radius:var(--r2);padding:1.5rem;margin-bottom:1rem;display:none;box-shadow:0 4px 16px rgba(217,119,6,.15);}
+.ot-review-panel.open{display:block;}
+.ot-review-title{font-size:15px;font-weight:600;color:var(--amber);display:flex;align-items:center;gap:8px;margin-bottom:1rem;}
+.ot-review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:1.25rem;}
+.ot-review-card{background:var(--bg);border-radius:var(--r);padding:.85rem 1rem;border:1px solid var(--border);}
+.ot-review-card .label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--subtle);margin-bottom:4px;}
+.ot-review-card .value{font-size:18px;font-weight:600;color:var(--text);}
+.ot-review-card .sub{font-size:11px;color:var(--subtle);margin-top:2px;}
+.ot-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem;}
+.ot-option{border:2px solid var(--border);border-radius:var(--r2);padding:1rem;cursor:pointer;transition:all .2s;text-align:center;}
+.ot-option:hover{border-color:var(--blue-m);background:var(--blue-l);}
+.ot-option.selected{border-color:var(--blue-m);background:var(--blue-l);}
+.ot-option.selected-bank{border-color:var(--bank);background:var(--bank-l);}
+.ot-option-icon{font-size:28px;margin-bottom:6px;}
+.ot-option-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.ot-option-desc{font-size:12px;color:var(--muted);}
+.ot-option-amount{font-size:16px;font-weight:700;margin-top:6px;}
+.ot-confirm-btn{background:linear-gradient(135deg,var(--blue-m),var(--green-m));color:#fff;border:none;padding:10px 28px;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;}
+.ot-confirm-btn:hover{opacity:.9;}
+.ot-confirm-btn:disabled{opacity:.4;cursor:not-allowed;}
+.review-week-btn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 14px;border-radius:99px;background:var(--amber-l);color:var(--amber);border:1px solid var(--amber-m);cursor:pointer;font-family:inherit;margin-left:8px;}
+.review-week-btn:hover{background:var(--amber-m);color:#fff;}
+
+/* Holiday system */
+.holiday-badge{background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;display:inline-block;}
+body.dark .holiday-badge{background:#451A03;color:#FDE68A;}
+tr.holiday-row td{border-left:3px solid #F59E0B;}
+.holiday-pay-note{font-size:10px;color:var(--amber);font-weight:500;margin-top:2px;display:block;}
+
+/* Holiday Review Modal */
+.holiday-modal{background:var(--card);border-radius:var(--r2);padding:1.5rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 48px rgba(0,0,0,.2);}
+.holiday-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.holiday-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:all .15s;}
+.holiday-item:hover{border-color:var(--amber-m);background:var(--amber-l);}
+.holiday-item.used{opacity:.5;cursor:not-allowed;}
+.holiday-item-left{display:flex;flex-direction:column;gap:2px;}
+.holiday-item-name{font-size:13px;font-weight:600;color:var(--text);}
+.holiday-item-date{font-size:11px;color:var(--muted);}
+.holiday-item-right{font-size:12px;color:var(--subtle);}
+.holiday-calc-box{background:var(--amber-l);border:1px solid var(--amber-m);border-radius:var(--r);padding:1rem 1.25rem;margin-bottom:1rem;display:none;}
+.holiday-calc-box.open{display:block;}
+.holiday-calc-title{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:8px;}
+.holiday-calc-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text);padding:3px 0;}
+.holiday-calc-total{display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--amber);padding-top:8px;border-top:1px solid var(--amber-m);margin-top:6px;}
+.holiday-confirm-btn{background:linear-gradient(135deg,#D97706,#F59E0B);color:#fff;border:none;padding:9px 22px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;}
+.holiday-confirm-btn:hover{opacity:.9;}
+.floater-note{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:8px;}
 </style>
 </head>
 <body>
@@ -365,6 +414,7 @@ tr.hidden-row:hover td{opacity:0.5;}
             <hr class="em-divider"/>
             <p class="em-label">Settings</p>
             <div class="em-item" onclick="openLocModal()">📍 Manage locations</div>
+            <div class="em-item" onclick="openHolidayModal()">🎉 Add holiday pay</div>
           </div>
         </div>
         <button class="icon-btn" onclick="toggleBankPanel()" title="Hour bank" style="font-size:20px;">🏦</button>
@@ -374,7 +424,10 @@ tr.hidden-row:hover td{opacity:0.5;}
   </div>
 
   <!-- Alerts -->
-  <div class="alert-bar alert-ot" id="ot-alert"><i class="ti ti-alert-triangle"></i><span id="ot-alert-msg"></span></div>
+  <div class="alert-bar alert-ot" id="ot-alert" style="justify-content:space-between;">
+    <span style="display:flex;align-items:center;gap:10px;"><i class="ti ti-alert-triangle"></i><span id="ot-alert-msg"></span></span>
+    <button class="review-week-btn" onclick="openOTReview()">📋 Review week</button>
+  </div>
   <div class="alert-bar alert-bank" id="bank-alert"><i class="ti ti-piggy-bank"></i><span id="bank-alert-msg"></span></div>
 
   <!-- Hour Bank Panel -->
@@ -500,6 +553,39 @@ tr.hidden-row:hover td{opacity:0.5;}
   <div class="section-head">
     <h2>Time log <span id="hidden-count-badge"></span></h2>
     <span class="select-hint">Hold <kbd style="font-size:10px;background:#eee;padding:1px 5px;border-radius:3px;border:1px solid #ccc;">Shift</kbd> + click to multi-select</span>
+  </div>
+
+  <!-- OT Review Panel -->
+  <div class="ot-review-panel" id="ot-review-panel">
+    <div class="ot-review-title">⚠️ Weekly OT Review <span id="ot-review-week-label" style="font-size:13px;font-weight:400;color:var(--muted);"></span></div>
+    <div class="ot-review-grid">
+      <div class="ot-review-card"><p class="label">Total hours</p><p class="value" id="otr-total-h">—</p></div>
+      <div class="ot-review-card"><p class="label">Regular (up to 40h)</p><p class="value" id="otr-reg-h">—</p><p class="sub" id="otr-reg-pay"></p></div>
+      <div class="ot-review-card"><p class="label">Excess hours</p><p class="value" id="otr-excess-h" style="color:var(--amber);">—</p><p class="sub">Over 40h threshold</p></div>
+      <div class="ot-review-card"><p class="label">Your rate</p><p class="value" id="otr-rate">—</p></div>
+    </div>
+    <p style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text);">What would you like to do with the excess <span id="otr-excess-label"></span>?</p>
+    <div class="ot-options">
+      <div class="ot-option" id="ot-opt-pay" onclick="selectOTOption('pay')">
+        <div class="ot-option-icon">💰</div>
+        <div class="ot-option-title">Pay as overtime</div>
+        <div class="ot-option-desc">Excess hours paid at 1.5× your hourly rate</div>
+        <div class="ot-option-amount" id="otr-ot-amount" style="color:var(--green-m);"></div>
+      </div>
+      <div class="ot-option" id="ot-opt-bank" onclick="selectOTOption('bank')">
+        <div class="ot-option-icon">🏦</div>
+        <div class="ot-option-title">Bank the hours</div>
+        <div class="ot-option-desc">Excess hours go to your bank at regular rate</div>
+        <div class="ot-option-amount" id="otr-bank-amount" style="color:var(--bank);"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <button class="ot-confirm-btn" id="ot-confirm-btn" onclick="confirmOTReview()" disabled>
+        <i class="ti ti-check"></i> Confirm & save adjustment
+      </button>
+      <button class="btn-cancel" onclick="closeOTReview()">Cancel</button>
+      <span id="ot-already-done" style="font-size:12px;color:var(--green-m);display:none;">✓ OT already reviewed this week</span>
+    </div>
   </div>
 
   <!-- Bulk bar -->
@@ -638,6 +724,50 @@ tr.hidden-row:hover td{opacity:0.5;}
   </div>
 </div>
 
+
+
+<!-- Holiday Pay Modal -->
+<div class="modal-overlay" id="holiday-modal-overlay" onclick="closeHolidayModal(event)">
+  <div class="holiday-modal">
+    <div class="modal-header">
+      <h3>🎉 Holiday Pay</h3>
+      <button class="modal-close" onclick="closeHolidayModalDirect()">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Select a holiday to calculate and record pay based on your last 4 weeks of C14613 hours.</p>
+    <p class="floater-note">🗓️ You have 1 floater holiday — use it for any date not on this list.</p>
+
+    <div class="holiday-list" id="holiday-list"></div>
+
+    <!-- Floater option -->
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+      <p style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;">🗓️ Floater holiday</p>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <div class="fg" style="flex:1;min-width:150px;">
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Date</label>
+          <input type="date" id="floater-date" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);width:100%;font-family:inherit;outline:none;"/>
+        </div>
+        <div class="fg" style="flex:1;min-width:150px;">
+          <label style="font-size:12px;color:var(--muted);font-weight:500;">Name</label>
+          <input type="text" id="floater-name" placeholder="e.g. Personal day" style="font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#FAFAF8;color:var(--text);width:100%;font-family:inherit;outline:none;"/>
+        </div>
+        <button onclick="selectHoliday('floater')" style="margin-top:18px;background:var(--amber-l);color:var(--amber);border:1px solid var(--amber-m);padding:8px 14px;border-radius:var(--r);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Calculate →</button>
+      </div>
+    </div>
+
+    <!-- Calculation preview -->
+    <div class="holiday-calc-box" id="holiday-calc-box">
+      <p class="holiday-calc-title">📊 Holiday pay calculation</p>
+      <div id="holiday-calc-details"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="holiday-confirm-btn" id="holiday-confirm-btn" onclick="confirmHolidayPay()" style="display:none;">
+        🎉 Save holiday pay entry
+      </button>
+      <button class="btn-cancel" onclick="closeHolidayModalDirect()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- Locations manager modal -->
 <div class="modal-overlay" id="loc-modal-overlay" onclick="closeLocModal(event)">
@@ -1380,7 +1510,14 @@ function render(){
   document.getElementById('m-km').textContent=totKm>0?totKm.toFixed(1)+' km':'0 km';
   document.getElementById('m-exp').textContent=fmt(totExp);
   document.getElementById('m-total').textContent=fmt(totAll);
-  document.getElementById('m-outstanding').textContent=fmt(outstanding)+' outstanding';
+  // Holiday pay note on total paid card
+  const holidayTotal=fCalc.filter(e=>e.note&&e.note.includes('Holiday pay')).reduce((s,e)=>s+(e.earned||0),0);
+  const mOutstanding=document.getElementById('m-outstanding');
+  if(mOutstanding){
+    let outText=fmt(outstanding)+' outstanding';
+    if(holidayTotal>0) outText+=`<br><span class="holiday-pay-note">🎉 incl. ${fmt(holidayTotal)} holiday pay</span>`;
+    mOutstanding.innerHTML=outText;
+  }
   document.getElementById('m-bank').textContent=fmt_h(totalBanked);
   document.getElementById('m-bank-sub').textContent=totalBanked>0?fmt(totalBanked*(parseFloat(getLast('rate'))||0))+' est. value':'Click to withdraw';
 
@@ -1420,9 +1557,10 @@ function render(){
       `<span class="badge b-travel">${(e.km||0)>0?parseFloat(e.km).toFixed(1)+'km':''}</span>${(e.tmin||0)>0?'<br><span class="travel-cell">'+fmtMin(e.tmin)+(e.dest?' · '+e.dest:'')+'</span>':''}`
       :'<span style="color:#ccc;">—</span>';
     const entryTags=(e.tag||'').split(',').map(t=>t.trim()).filter(Boolean);
-    const tagCell=entryTags.length?entryTags.map(t=>`<span class="badge b-tag" onclick="filterByTag('${t}')" style="cursor:pointer;margin-right:2px;">${t}</span>`).join(''):'<span style="color:#ccc;">—</span>';
+    const isHoliday=e.note&&e.note.includes('Holiday pay');
+    const tagCell=entryTags.length?entryTags.map(t=>`<span class="${isHoliday?'holiday-badge':'badge b-tag'}" onclick="filterByTag('${t}')" style="cursor:pointer;margin-right:2px;">${isHoliday?'🎉':''} ${t}</span>`).join(''):'<span style="color:#ccc;">—</span>';
     const breakdown=e.banked?`<div class="breakdown">🏦 ${fmt_h(e.banked_hours||0)} banked</div>`:(e.tmin>0?`<div class="breakdown">incl. ${fmtMin(e.tmin)} travel</div>`:'');
-    return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''} ${e.hidden?'hidden-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
+    return`<tr class="${sel?'selected ':''} ${e.banked?'banked-row':''} ${e.hidden?'hidden-row':''} ${e.note&&e.note.includes('Holiday pay')?'holiday-row':''}" onclick="handleRowClick(event,${e.id},${idx})" style="cursor:pointer;">
       <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" ${sel?'checked':''} onchange="toggleRowCb(${e.id},this.checked)"/></td>
       <td style="white-space:nowrap;font-size:12px;color:var(--muted)">${e.date}</td>
       <td>${fmt_h((e.hours||0)+(e.ot||0))}${otTag}${bankTag}${breakdown}</td>
@@ -1770,13 +1908,302 @@ function renderPayWidget(){
   const dl=document.getElementById('pp-days-left'); if(dl) dl.textContent=isCurrent?daysLeft+' days left':'';
 }
 
+
+// ── Weekly OT Review ──────────────────────────────────────
+let otReviewChoice = null; // 'pay' or 'bank'
+
+function getWeekEntries(){
+  // Get current week's paid (non-banked, non-hidden) entries
+  const {start,end} = getPeriodRange('week', periodOffset);
+  return entries.filter(e => e.date>=start && e.date<=end && !e.banked && !e.hidden);
+}
+
+function getWeekOTData(){
+  const weekEntries = getWeekEntries();
+  const threshold = parseFloat(document.getElementById('ot-threshold').value)||40;
+  const totH = weekEntries.reduce((s,e)=>s+(e.hours||0)+((e.tmin||0)/60),0);
+  const rate = weekEntries.length>0 ? (weekEntries[weekEntries.length-1].rate||0) : 0;
+  const excess = Math.max(0, totH - threshold);
+  const regH = Math.min(totH, threshold);
+  return { totH, excess, regH, rate, threshold, weekEntries };
+}
+
+function openOTReview(){
+  // Check if OT adjustment already exists this week
+  const {start,end} = getPeriodRange('week', periodOffset);
+  const alreadyDone = entries.some(e=>e.date>=start&&e.date<=end&&e.note&&e.note.includes('OT adjustment'));
+  
+  const d = getWeekOTData();
+  const {start:ws, end:we} = getPeriodRange('week', periodOffset);
+  
+  // Populate panel
+  document.getElementById('ot-review-week-label').textContent = '— '+ws+' to '+we;
+  document.getElementById('otr-total-h').textContent = fmt_h(d.totH);
+  document.getElementById('otr-reg-h').textContent = fmt_h(d.regH);
+  document.getElementById('otr-reg-pay').textContent = fmt(d.regH * d.rate);
+  document.getElementById('otr-excess-h').textContent = fmt_h(d.excess);
+  document.getElementById('otr-excess-label').textContent = fmt_h(d.excess);
+  document.getElementById('otr-rate').textContent = fmt(d.rate)+'/h';
+  document.getElementById('otr-ot-amount').textContent = '+'+ fmt(d.excess * d.rate * 1.5) + ' extra';
+  document.getElementById('otr-bank-amount').textContent = fmt_h(d.excess) +' added to bank';
+
+  // Already reviewed?
+  const alreadyEl = document.getElementById('ot-already-done');
+  const confirmBtn = document.getElementById('ot-confirm-btn');
+  if(alreadyDone){
+    alreadyEl.style.display='inline';
+    confirmBtn.disabled=true;
+  } else {
+    alreadyEl.style.display='none';
+    confirmBtn.disabled=otReviewChoice===null;
+  }
+
+  // Reset selection
+  otReviewChoice=null;
+  document.getElementById('ot-opt-pay').className='ot-option';
+  document.getElementById('ot-opt-bank').className='ot-option';
+
+  // Open panel
+  document.getElementById('ot-review-panel').classList.add('open');
+  document.getElementById('ot-review-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeOTReview(){
+  document.getElementById('ot-review-panel').classList.remove('open');
+  otReviewChoice=null;
+}
+
+function selectOTOption(choice){
+  otReviewChoice=choice;
+  document.getElementById('ot-opt-pay').className='ot-option'+(choice==='pay'?' selected':'');
+  document.getElementById('ot-opt-bank').className='ot-option'+(choice==='bank'?' selected-bank':'');
+  document.getElementById('ot-confirm-btn').disabled=false;
+}
+
+async function confirmOTReview(){
+  if(!otReviewChoice) return;
+  const d = getWeekOTData();
+  if(d.excess<=0){ showToast('No excess hours to adjust'); closeOTReview(); return; }
+
+  // Get the last entry date in the week for the adjustment entry date
+  const lastEntry = d.weekEntries.sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const adjDate = lastEntry ? lastEntry.date : new Date().toISOString().split('T')[0];
+
+  let row;
+  if(otReviewChoice==='pay'){
+    // Create OT pay entry
+    const otPay = d.excess * d.rate * 1.5;
+    row = {
+      date: adjDate,
+      hours: d.excess,
+      ot: 0,
+      rate: d.rate,
+      otm: 1.5,
+      exp: 0,
+      loc: '',
+      inv: 'unpaid',
+      note: 'OT adjustment — '+fmt_h(d.excess)+' at 1.5× (auto)',
+      tag: '',
+      km: 0, tmin: 0, dest: '', krate: 0,
+      trav_earn: 0,
+      hrly_pay: otPay,
+      earned: otPay,
+      banked: false,
+      banked_hours: 0,
+      hidden: false
+    };
+    showToast('💰 OT entry saved — '+fmt(otPay)+' added');
+  } else {
+    // Create banked hours entry
+    row = {
+      date: adjDate,
+      hours: d.excess,
+      ot: 0,
+      rate: d.rate,
+      otm: 1,
+      exp: 0,
+      loc: '',
+      inv: 'unpaid',
+      note: 'OT adjustment — '+fmt_h(d.excess)+' banked (auto)',
+      tag: '',
+      km: 0, tmin: 0, dest: '', krate: 0,
+      trav_earn: 0,
+      hrly_pay: 0,
+      earned: 0,
+      banked: true,
+      banked_hours: d.excess,
+      hidden: false
+    };
+    showToast('🏦 '+fmt_h(d.excess)+' banked successfully');
+  }
+
+  try{
+    await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    updateLastSaved();
+    closeOTReview();
+    await loadEntries();
+    renderPayWidget();
+  }catch(e){ showToast('Error saving adjustment: '+e.message); }
+}
+
+
+// ── Holiday Pay System ────────────────────────────────────
+// Quebec holidays for 2026 with weekend substitution logic
+const HOLIDAYS_2026 = [
+  { id:'goodfriday',    name:'Good Friday',          date:'2026-04-03', orig:'2026-04-03' },
+  { id:'victoria',      name:'Victoria Day',          date:'2026-05-18', orig:'2026-05-18' },
+  { id:'saintjean',     name:'St-Jean-Baptiste',      date:'2026-06-24', orig:'2026-06-24' },
+  { id:'canadaday',     name:'Canada Day',            date:'2026-07-01', orig:'2026-07-01' },
+  { id:'labour',        name:'Labour Day',            date:'2026-09-07', orig:'2026-09-07' },
+  { id:'thanksgiving',  name:'Thanksgiving',          date:'2026-10-12', orig:'2026-10-12' },
+  { id:'christmas',     name:'Christmas Day',         date:'2026-12-25', orig:'2026-12-25' },
+  { id:'christmas2',    name:'Christmas (substitute)',date:'2026-12-28', orig:'2026-12-26', note:'Dec 26 falls on Saturday → Monday Dec 28' },
+  { id:'newyears',      name:"New Year's Day",        date:'2027-01-01', orig:'2027-01-01' },
+];
+// 2027 holidays for New Year's
+const HOLIDAYS_2027 = [
+  { id:'newyears27',    name:"New Year's Day 2027",   date:'2027-01-01', orig:'2027-01-01' },
+];
+
+let selectedHolidayId = null;
+let holidayCalcData = null;
+
+function getUsedHolidayDates(){
+  return entries
+    .filter(e => e.note && e.note.includes('Holiday pay'))
+    .map(e => e.date);
+}
+
+function openHolidayModal(){
+  document.getElementById('export-menu').classList.remove('open');
+  selectedHolidayId = null;
+  holidayCalcData = null;
+  document.getElementById('holiday-calc-box').classList.remove('open');
+  document.getElementById('holiday-confirm-btn').style.display = 'none';
+  document.getElementById('floater-date').value = '';
+  document.getElementById('floater-name').value = '';
+  renderHolidayList();
+  document.getElementById('holiday-modal-overlay').classList.add('open');
+}
+
+function closeHolidayModal(ev){ if(ev.target===document.getElementById('holiday-modal-overlay')) closeHolidayModalDirect(); }
+function closeHolidayModalDirect(){ document.getElementById('holiday-modal-overlay').classList.remove('open'); }
+
+function renderHolidayList(){
+  const used = getUsedHolidayDates();
+  const allHolidays = [...HOLIDAYS_2026];
+  const list = document.getElementById('holiday-list');
+  list.innerHTML = allHolidays.map(h => {
+    const isUsed = used.includes(h.date);
+    const today = new Date().toISOString().split('T')[0];
+    const isPast = h.date <= today;
+    const d = new Date(h.date+'T12:00:00');
+    const dateStr = d.toLocaleDateString('en-CA',{weekday:'short',month:'long',day:'numeric',year:'numeric'});
+    return `<div class="holiday-item ${isUsed?'used':''}" onclick="${isUsed?'':"selectHoliday('"+h.id+"')"}">
+      <div class="holiday-item-left">
+        <span class="holiday-item-name">🎉 ${h.name}</span>
+        <span class="holiday-item-date">${dateStr}${h.note?' — '+h.note:''}</span>
+      </div>
+      <div class="holiday-item-right">${isUsed?'✓ Already recorded':isPast?'Past':'Upcoming'}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectHoliday(id){
+  selectedHolidayId = id;
+  let holiday, holidayDate, holidayName;
+
+  if(id === 'floater'){
+    holidayDate = document.getElementById('floater-date').value;
+    holidayName = document.getElementById('floater-name').value.trim() || 'Floater Holiday';
+    if(!holidayDate){ alert('Please select a date for the floater holiday.'); return; }
+  } else {
+    holiday = HOLIDAYS_2026.find(h=>h.id===id);
+    if(!holiday) return;
+    holidayDate = holiday.date;
+    holidayName = holiday.name;
+  }
+
+  // Calculate: look back 4 calendar weeks from holiday date
+  const hDate = new Date(holidayDate+'T12:00:00');
+  const fourWeeksBack = new Date(hDate);
+  fourWeeksBack.setDate(hDate.getDate() - 28);
+  const startStr = fourWeeksBack.toISOString().split('T')[0];
+  const endStr = new Date(hDate.getTime() - 86400000).toISOString().split('T')[0]; // day before holiday
+
+  // Filter entries: C14613 tag, not banked, not hidden, in the 4-week window
+  const qualifying = entries.filter(e => {
+    if(e.date < startStr || e.date > endStr) return false;
+    if(e.banked || e.hidden) return false;
+    // Must have C14613 tag
+    const tags = (e.tag||'').split(',').map(t=>t.trim());
+    return tags.includes('C14613');
+  });
+
+  const totalHours = qualifying.reduce((s,e) => s + (e.hours||0), 0);
+  const rate = qualifying.length > 0 ? (qualifying[qualifying.length-1].rate||0) : (parseFloat(getLast('rate'))||38.46);
+  const holidayPay = (totalHours * rate) / 20;
+
+  holidayCalcData = { holidayDate, holidayName, totalHours, rate, holidayPay, startStr, endStr, qualifying };
+
+  // Show calculation box
+  const calcBox = document.getElementById('holiday-calc-box');
+  const details = document.getElementById('holiday-calc-details');
+  details.innerHTML = `
+    <div class="holiday-calc-row"><span>Reference period</span><span>${startStr} to ${endStr}</span></div>
+    <div class="holiday-calc-row"><span>C14613 entries found</span><span>${qualifying.length} entries</span></div>
+    <div class="holiday-calc-row"><span>Total C14613 hours</span><span>${fmt_h(totalHours)}</span></div>
+    <div class="holiday-calc-row"><span>Hourly rate</span><span>${fmt(rate)}/h</span></div>
+    <div class="holiday-calc-row"><span>Formula</span><span>${fmt_h(totalHours)} × ${fmt(rate)} ÷ 20</span></div>
+    <div class="holiday-calc-total"><span>Holiday pay for ${holidayName}</span><span>${fmt(holidayPay)}</span></div>
+    ${totalHours === 0 ? '<p style="font-size:11px;color:var(--red);margin-top:8px;">⚠️ No C14613 hours found in the reference period. Holiday pay will be $0.00.</p>' : ''}
+  `;
+  calcBox.classList.add('open');
+  document.getElementById('holiday-confirm-btn').style.display = 'flex';
+}
+
+async function confirmHolidayPay(){
+  if(!holidayCalcData) return;
+  const { holidayDate, holidayName, totalHours, rate, holidayPay, startStr, endStr } = holidayCalcData;
+
+  const row = {
+    date: holidayDate,
+    hours: 0,          // excluded from hour totals
+    ot: 0,
+    rate: rate,
+    otm: 1,
+    exp: 0,
+    loc: '',
+    inv: 'unpaid',
+    note: `Holiday pay — ${holidayName} (${fmt_h(totalHours)} C14613 hrs ÷ 20)`,
+    tag: 'Holiday',
+    km: 0, tmin: 0, dest: '', krate: 0,
+    trav_earn: 0,
+    hrly_pay: holidayPay,
+    earned: holidayPay,
+    banked: false,
+    banked_hours: 0,
+    hidden: false,
+    is_holiday: true
+  };
+
+  try{
+    await apiFetch('entries',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify(row)});
+    showToast('🎉 Holiday pay saved — '+fmt(holidayPay));
+    updateLastSaved();
+    closeHolidayModalDirect();
+    await loadEntries();
+    renderPayWidget();
+  }catch(e){ showToast('Error saving holiday: '+e.message); }
+}
+
 function filterByTag(tag){ selectedTags.clear(); selectedTags.add(tag); updateTagFilterUI(); render(); }
 function showToast(msg){document.getElementById('toast-msg').textContent=msg;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
 // ── Startup ───────────────────────────────────────────────
 async function ensureColumns(){
   try{
-    await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay,start_time,end_time,hidden&limit=1');window.hasTagCol=true;
+    await apiFetch('entries?select=tag,banked,banked_hours,hrly_pay,start_time,end_time,hidden&limit=1'); // is_holiday stored in note fieldwindow.hasTagCol=true;
   }catch(e){window.hasTagCol=false;}
 }
 ensureColumns().then(()=>{ loadEntries(); loadLocations(); });
